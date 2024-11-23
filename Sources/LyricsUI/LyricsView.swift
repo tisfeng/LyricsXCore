@@ -7,54 +7,76 @@
 //  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
 
-import Combine
-import SwiftUI
 import ComposableArchitecture
 import LyricsXCore
-import LyricsCore
 import MusicPlayer
+import SwiftUI
 
+@available(macOS 13.0, *)
 public struct LyricsView: View {
-    
+
     @EnvironmentObject
     public var coreStore: ViewStore<LyricsXCoreState, LyricsXCoreAction>
-    
+
     @Binding
     public var isAutoScrollEnabled: Bool
-    
+
     public var showTranslation: Bool
-    
+
     public init(isAutoScrollEnabled: Binding<Bool>, showTranslation: Bool) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
         self.showTranslation = showTranslation
     }
-    
+
     public var body: some View {
         if let progressing = coreStore.progressingState {
+            let currentLineIndex = progressing.currentLineIndex
+            let lyricsLines = progressing.lyrics.lines
+
             GeometryReader { geometry in
                 ScrollViewReader { scrollProxy in
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 8) {
-                            ForEach(progressing.lyrics.lines.indices, id: \.self) { index in
-                                LyricsLineView(line: progressing.lyrics.lines[index], showTranslation: showTranslation)
-                                    .opacity(progressing.currentLineIndex == index ? 1 : 0.6)
-                                    .scaleEffect(progressing.currentLineIndex == index ? 1 : 0.9, anchor: .topLeading)
-                                    .animation(.default, value: progressing.currentLineIndex == index)
-                                // TODO:
-                                if progressing.currentLineIndex == index {
-                                    Spacer(minLength: 4)
-                                }
-                            }
+                    List {
+                        addHalfHeightSpacer(geometry)
+
+                        ForEach(lyricsLines.indices, id: \.self) { index in
+                            LyricsLineView(
+                                line: lyricsLines[index],
+                                showTranslation: showTranslation
+                            )
+                            .opacity(currentLineIndex == index ? 1 : 0.6)
+                            .scaleEffect(
+                                currentLineIndex == index ? 1 : 0.9,
+                                anchor: .topLeading
+                            )
+                            .padding(.vertical, currentLineIndex == index ? 10 : 0)
+                            .animation(.default, value: currentLineIndex == index)
+                            .gesture(
+                                TapGesture()
+                                    .onEnded { _ in
+                                        isAutoScrollEnabled = true
+                                        let position = lyricsLines[index].position
+                                        let playbackState = PlaybackState.playing(time: position)
+                                        let action = LyricsProgressingAction.playbackStateUpdated(
+                                            playbackState)
+                                        coreStore.send(.progressingAction(action))
+                                    }
+                            )
                         }
-                        .padding(.vertical, geometry.size.height / 2)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+
+                        addHalfHeightSpacer(geometry)
                     }
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
                     .gesture(
                         DragGesture()
                             .onChanged { _ in
                                 isAutoScrollEnabled = false
                             }
                     )
-                    .onChange(of: progressing.currentLineIndex) { index in
+                    .onChange(of: currentLineIndex) { index in
                         if isAutoScrollEnabled, let index = index {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 scrollProxy.scrollTo(index, anchor: .center)
@@ -62,14 +84,14 @@ public struct LyricsView: View {
                         }
                     }
                     .onChange(of: isAutoScrollEnabled) { enabled in
-                        if enabled, let index = coreStore.progressingState?.currentLineIndex {
+                        if enabled, let index = currentLineIndex {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 scrollProxy.scrollTo(index, anchor: .center)
                             }
                         }
                     }
                     .onChange(of: showTranslation) { _ in
-                        if let index = coreStore.progressingState?.currentLineIndex {
+                        if let index = currentLineIndex {
                             scrollProxy.scrollTo(index, anchor: .center)
                             isAutoScrollEnabled = true
                         }
@@ -80,17 +102,21 @@ public struct LyricsView: View {
                 coreStore.send(.progressingAction(.recalculateCurrentLineIndex))
             }
         }
-        
+    }
+
+    func addHalfHeightSpacer(_ geometry: GeometryProxy) -> some View {
+        Spacer(minLength: geometry.size.height / 2)
     }
 }
 
 import LyricsUIPreviewSupport
 
+@available(macOS 13.0, *)
 struct LyricsView_Previews: PreviewProvider {
-    
+
     @State
     static var isAutoScrollEnabled = true
-    
+
     static var previews: some View {
         let store = Store(
             initialState: PreviewResources.coreState,
@@ -103,12 +129,6 @@ struct LyricsView_Previews: PreviewProvider {
             environment: .default)
         let viewStore = ViewStore(store)
         return Group {
-            LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled, showTranslation: true)
-                .environmentObject(viewStore)
-                .padding()
-                .background(Color.systemBackground)
-                .environment(\.colorScheme, .light)
-            
             LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled, showTranslation: true)
                 .environmentObject(viewStore)
                 .padding()
