@@ -11,6 +11,7 @@ import Combine
 import ComposableArchitecture
 import LyricsService
 import MusicPlayer
+import Foundation
 
 public struct LyricsSearchingState: Equatable {
     public let track: MusicTrack

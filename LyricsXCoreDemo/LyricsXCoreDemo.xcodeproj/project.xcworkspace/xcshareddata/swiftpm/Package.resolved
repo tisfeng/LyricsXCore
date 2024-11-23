@@ -49,19 +49,18 @@
     {
       "identity" : "lyricskit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ddddxxx/LyricsKit",
+      "location" : "https://github.com/tisfeng/LyricsKit",
       "state" : {
-        "revision" : "675a696588eaddf3e5661080c223102acdf8f404",
-        "version" : "0.11.3"
+        "revision" : "6b131e8aa91ca7fb21d8d5b37528b1be36c38b2c"
       }
     },
     {
       "identity" : "musicplayer",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ddddxxx/MusicPlayer",
+      "location" : "https://github.com/tisfeng/MusicPlayer",
       "state" : {
-        "revision" : "6eee88b4800bba1cc03b2a233fe858ccca7c9862",
-        "version" : "0.8.3"
+        "branch" : "dev",
+        "revision" : "324fe79edc347b5d9d5d4916ed67deef20abfbfa"
       }
     },
     {
@@ -83,12 +82,21 @@
       }
     },
     {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "3ca8249bd3262e9837c6cb4d352cc58e370e33fc",
-        "version" : "0.20.0"
+        "revision" : "9ea8c763061287052a68d5e6723fed45e898b7d9",
+        "version" : "0.40.2"
       }
     },
     {
@@ -101,12 +109,30 @@
       }
     },
     {
+      "identity" : "swift-custom-dump",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-custom-dump",
+      "state" : {
+        "revision" : "0a5bff05fe01dcd513932ed338a4efad8268b803",
+        "version" : "0.11.2"
+      }
+    },
+    {
+      "identity" : "swift-identified-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-identified-collections",
+      "state" : {
+        "revision" : "d01446a78fb768adc9a78cbb6df07767c8ccfc29",
+        "version" : "0.8.0"
+      }
+    },
+    {
       "identity" : "swiftcf",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ddddxxx/SwiftCF",
+      "location" : "https://github.com/Mx-Iris/SwiftCF",
       "state" : {
-        "revision" : "72775c4b4dfceba8f6f43820d50f9286dc97160d",
-        "version" : "0.2.1"
+        "branch" : "master",
+        "revision" : "46f9d814b5197d33286235036d2e3c982e885fad"
       }
     },
     {

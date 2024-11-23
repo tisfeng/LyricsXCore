@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03674EAB2CF1DAA10062BA63 /* LyricsXCore in Frameworks */ = {isa = PBXBuildFile; productRef = 03674EAA2CF1DAA10062BA63 /* LyricsXCore */; };
+		03674ECC2CF1DC030062BA63 /* LyricsXCore in Frameworks */ = {isa = PBXBuildFile; productRef = 03674ECB2CF1DC030062BA63 /* LyricsXCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03674EAB2CF1DAA10062BA63 /* LyricsXCore in Frameworks */,
+				03674ECC2CF1DC030062BA63 /* LyricsXCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,7 +78,7 @@
 			);
 			name = LyricsXCoreDemo;
 			packageProductDependencies = (
-				03674EAA2CF1DAA10062BA63 /* LyricsXCore */,
+				03674ECB2CF1DC030062BA63 /* LyricsXCore */,
 			);
 			productName = LyricsXCoreDemo;
 			productReference = 03674E8C2CF1D9700062BA63 /* LyricsXCoreDemo.app */;
@@ -109,7 +109,7 @@
 			mainGroup = 03674E832CF1D9700062BA63;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				03674E9E2CF1D9890062BA63 /* XCLocalSwiftPackageReference "../../LyricsXCore" */,
+				03674ECA2CF1DC030062BA63 /* XCLocalSwiftPackageReference "../../LyricsXCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 03674E8D2CF1D9700062BA63 /* Products */;
@@ -338,16 +338,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		03674E9E2CF1D9890062BA63 /* XCLocalSwiftPackageReference "../../LyricsXCore" */ = {
+		03674ECA2CF1DC030062BA63 /* XCLocalSwiftPackageReference "../../LyricsXCore" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../LyricsXCore;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		03674EAA2CF1DAA10062BA63 /* LyricsXCore */ = {
+		03674ECB2CF1DC030062BA63 /* LyricsXCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03674E9E2CF1D9890062BA63 /* XCLocalSwiftPackageReference "../../LyricsXCore" */;
 			productName = LyricsXCore;
 		};
 /* End XCSwiftPackageProductDependency section */
