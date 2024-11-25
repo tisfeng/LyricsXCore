@@ -70,6 +70,7 @@ public struct LyricsView: View {
                     .listStyle(PlainListStyle())
                     .scrollContentBackground(.hidden)
                     .background(Color.clear)
+                    .scrollIndicators(.hidden)
                     .gesture(
                         DragGesture()
                             .onChanged { _ in
@@ -99,7 +100,7 @@ public struct LyricsView: View {
                 }
             }
             .onAppear {
-                coreStore.send(.progressingAction(.recalculateCurrentLineIndex))
+//                coreStore.send(.progressingAction(.recalculateCurrentLineIndex))
             }
         }
     }

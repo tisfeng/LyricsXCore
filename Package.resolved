@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/pointfreeco/combine-schedulers",
         "state": {
           "branch": null,
-          "revision": "c37e5ae8012fb654af776cc556ff8ae64398c841",
-          "version": "0.5.0"
+          "revision": "ec62f32d21584214a4b27c8cee2b2ad70ab2c38a",
+          "version": "0.11.0"
         }
       },
       {
@@ -48,20 +48,20 @@
       },
       {
         "package": "LyricsKit",
-        "repositoryURL": "https://github.com/ddddxxx/LyricsKit",
+        "repositoryURL": "https://github.com/tisfeng/LyricsKit",
         "state": {
           "branch": null,
-          "revision": "5506ee497ca689ed1686655ebb11e8ee29cc24cb",
-          "version": "0.11.0"
+          "revision": "6b131e8aa91ca7fb21d8d5b37528b1be36c38b2c",
+          "version": null
         }
       },
       {
         "package": "MusicPlayer",
-        "repositoryURL": "https://github.com/ddddxxx/MusicPlayer",
+        "repositoryURL": "https://github.com/tisfeng/MusicPlayer",
         "state": {
-          "branch": null,
-          "revision": "08a5aafa29589308365b3c97b55eda4cea03652c",
-          "version": "0.8.1"
+          "branch": "dev",
+          "revision": "324fe79edc347b5d9d5d4916ed67deef20abfbfa",
+          "version": null
         }
       },
       {
@@ -78,8 +78,17 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-case-paths",
         "state": {
           "branch": null,
-          "revision": "1aa1bf7c4069d9ba2f7edd36dbfc96ff1c58cbff",
-          "version": "0.1.3"
+          "revision": "fc45e7b2cfece9dd80b5a45e6469ffe67fe67984",
+          "version": "0.14.1"
+        }
+      },
+      {
+        "package": "swift-collections",
+        "repositoryURL": "https://github.com/apple/swift-collections",
+        "state": {
+          "branch": null,
+          "revision": "671108c96644956dddcd89dd59c203dcdb36cec7",
+          "version": "1.1.4"
         }
       },
       {
@@ -87,17 +96,44 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-composable-architecture",
         "state": {
           "branch": null,
-          "revision": "3ca8249bd3262e9837c6cb4d352cc58e370e33fc",
-          "version": "0.20.0"
+          "revision": "9ea8c763061287052a68d5e6723fed45e898b7d9",
+          "version": "0.40.2"
+        }
+      },
+      {
+        "package": "swift-concurrency-extras",
+        "repositoryURL": "https://github.com/pointfreeco/swift-concurrency-extras",
+        "state": {
+          "branch": null,
+          "revision": "a46265bb4f75808b0e15d971eebc408f557870a3",
+          "version": "0.1.2"
+        }
+      },
+      {
+        "package": "swift-custom-dump",
+        "repositoryURL": "https://github.com/pointfreeco/swift-custom-dump",
+        "state": {
+          "branch": null,
+          "revision": "0a5bff05fe01dcd513932ed338a4efad8268b803",
+          "version": "0.11.2"
+        }
+      },
+      {
+        "package": "swift-identified-collections",
+        "repositoryURL": "https://github.com/pointfreeco/swift-identified-collections",
+        "state": {
+          "branch": null,
+          "revision": "d01446a78fb768adc9a78cbb6df07767c8ccfc29",
+          "version": "0.8.0"
         }
       },
       {
         "package": "SwiftCF",
-        "repositoryURL": "https://github.com/ddddxxx/SwiftCF",
+        "repositoryURL": "https://github.com/Mx-Iris/SwiftCF",
         "state": {
-          "branch": null,
-          "revision": "72775c4b4dfceba8f6f43820d50f9286dc97160d",
-          "version": "0.2.1"
+          "branch": "master",
+          "revision": "46f9d814b5197d33286235036d2e3c982e885fad",
+          "version": null
         }
       },
       {
@@ -105,8 +141,8 @@
         "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
         "state": {
           "branch": null,
-          "revision": "603974e3909ad4b48ba04aad7e0ceee4f077a518",
-          "version": "0.1.0"
+          "revision": "50843cbb8551db836adec2290bb4bc6bac5c1865",
+          "version": "0.9.0"
         }
       }
     ]
