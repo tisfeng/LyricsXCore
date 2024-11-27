@@ -27,6 +27,9 @@ struct ContentView: View {
     var body: some View {
         let viewStore = ViewStore(store)
 
+        // Start progressing from current line
+        viewStore.send(.progressingAction(.recalculateCurrentLineIndex))
+
         return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
             print("Tap position: \(position)")
         }

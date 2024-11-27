@@ -57,19 +57,15 @@ public struct LyricsView: View {
                             )
                             .padding(.vertical, currentLineIndex == index ? 10 : 0)
                             .animation(.default, value: currentLineIndex == index)
-                            .gesture(
-                                TapGesture()
-                                    .onEnded { _ in
-                                        isAutoScrollEnabled = true
-                                        let position = lyricsLines[index].position
-                                        let playbackState = PlaybackState.playing(time: position)
-                                        let action = LyricsProgressingAction.playbackStateUpdated(
-                                            playbackState)
-                                        coreStore.send(.progressingAction(action))
+                            .onTapGesture {
+                                isAutoScrollEnabled = true
+                                let position = lyricsLines[index].position
+                                let playbackState = PlaybackState.playing(time: position)
+                                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
+                                coreStore.send(.progressingAction(action))
 
-                                        onLyricsTap?(position)
-                                    }
-                            )
+                                onLyricsTap?(position)
+                            }
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
