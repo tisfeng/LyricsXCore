@@ -11,7 +11,7 @@ import SwiftUI
 struct LyricsXCoreDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            LyricsPlayerView()
+            ContentView()
         }
     }
 }

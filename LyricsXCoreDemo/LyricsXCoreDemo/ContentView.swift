@@ -27,7 +27,9 @@ struct ContentView: View {
     var body: some View {
         let viewStore = ViewStore(store)
 
-        return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled, showTranslation: true)
+        return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
+            print("Tap position: \(position)")
+        }
             .environmentObject(viewStore)
             .padding(.horizontal)
     }

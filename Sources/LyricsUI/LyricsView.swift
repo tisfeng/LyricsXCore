@@ -8,6 +8,8 @@
 //
 
 import ComposableArchitecture
+import LyricsCore
+import LyricsUIPreviewSupport
 import LyricsXCore
 import MusicPlayer
 import SwiftUI
@@ -20,12 +22,17 @@ public struct LyricsView: View {
 
     @Binding
     public var isAutoScrollEnabled: Bool
-
     public var showTranslation: Bool
+    public let onLyricsTap: ((TimeInterval) -> Void)?
 
-    public init(isAutoScrollEnabled: Binding<Bool>, showTranslation: Bool) {
+    public init(
+        isAutoScrollEnabled: Binding<Bool>,
+        showTranslation: Bool = true,
+        onLyricsTap: ((TimeInterval) -> Void)? = nil
+    ) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
         self.showTranslation = showTranslation
+        self.onLyricsTap = onLyricsTap
     }
 
     public var body: some View {
@@ -59,6 +66,8 @@ public struct LyricsView: View {
                                         let action = LyricsProgressingAction.playbackStateUpdated(
                                             playbackState)
                                         coreStore.send(.progressingAction(action))
+
+                                        onLyricsTap?(position)
                                     }
                             )
                         }
@@ -99,9 +108,6 @@ public struct LyricsView: View {
                     }
                 }
             }
-            .onAppear {
-//                coreStore.send(.progressingAction(.recalculateCurrentLineIndex))
-            }
         }
     }
 
@@ -109,8 +115,6 @@ public struct LyricsView: View {
         Spacer(minLength: geometry.size.height / 2)
     }
 }
-
-import LyricsUIPreviewSupport
 
 @available(macOS 13.0, *)
 struct LyricsView_Previews: PreviewProvider {
