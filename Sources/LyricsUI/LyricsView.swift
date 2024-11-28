@@ -59,8 +59,8 @@ public struct LyricsView: View {
                                 .padding(.vertical, currentLineIndex == index ? 10 : 0)
                                 .animation(.default, value: currentLineIndex == index)
                                 .onTapGesture {
-                                    scrollToLine(index: index)
-                                    isAutoScrollEnabled = true
+                                    scrollToIndex(index, proxy: scrollProxy)
+                                    playLyrics(at: index)
                                 }
                             }
                             .listRowBackground(Color.clear)
@@ -74,21 +74,17 @@ public struct LyricsView: View {
                         .scrollIndicators(.hidden)
                         .onChange(of: currentLineIndex) { index in
                             if isAutoScrollEnabled, let index = index {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    scrollProxy.scrollTo(index, anchor: .center)
-                                }
+                                scrollToIndex(index, proxy: scrollProxy)
                             }
                         }
                         .onChange(of: isAutoScrollEnabled) { enabled in
                             if enabled, let index = currentLineIndex {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    scrollProxy.scrollTo(index, anchor: .center)
-                                }
+                                scrollToIndex(index, proxy: scrollProxy)
                             }
                         }
                         .onChange(of: showTranslation) { _ in
                             if let index = currentLineIndex {
-                                scrollProxy.scrollTo(index, anchor: .center)
+                                scrollToIndex(index, proxy: scrollProxy)
                             }
                         }
 
@@ -112,22 +108,30 @@ public struct LyricsView: View {
         }
     }
 
-    func addHalfHeightSpacer(_ geometry: GeometryProxy) -> some View {
+    /// Add half height spacer.
+    private func addHalfHeightSpacer(_ geometry: GeometryProxy) -> some View {
         Spacer(minLength: geometry.size.height / 2)
     }
 
-    /// Scroll to the index line.
-    public func scrollToLine(index: Int) {
+    /// Play lyrics at index.
+    private func playLyrics(at lineIndex: Int) {
         if let progressing = coreStore.progressingState {
             let lyricsLines = progressing.lyrics.lines
-            if index < lyricsLines.count {
-                let position = lyricsLines[index].position
+            if lineIndex < lyricsLines.count {
+                let position = lyricsLines[lineIndex].position
                 let playbackState = PlaybackState.playing(time: position)
                 let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
                 coreStore.send(.progressingAction(action))
 
                 onLyricsTap?(position)
             }
+        }
+    }
+
+    /// Scroll to index with animation.
+    private func scrollToIndex(_ index: Int, proxy: ScrollViewProxy) {
+        withAnimation(.easeInOut) {
+            proxy.scrollTo(index, anchor: .center)
         }
     }
 }
