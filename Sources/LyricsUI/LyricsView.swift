@@ -59,8 +59,13 @@ public struct LyricsView: View {
                                 .padding(.vertical, currentLineIndex == index ? 10 : 0)
                                 .animation(.default, value: currentLineIndex == index)
                                 .onTapGesture {
-                                    scrollToIndex(index, proxy: scrollProxy)
                                     playLyrics(at: index)
+                                    scrollToIndex(index, proxy: scrollProxy)
+
+                                    // Wait for the animation to finish
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+//                                        isAutoScrollEnabled = true
+//                                    }
                                 }
                             }
                             .listRowBackground(Color.clear)
