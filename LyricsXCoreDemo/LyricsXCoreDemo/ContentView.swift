@@ -12,7 +12,7 @@ import LyricsXCore
 import LyricsUI
 
 struct ContentView: View {
-    @State var isAutoScrollEnabled = true
+    @State var isAutoScrollEnabled = false
 
     let store = Store(
         initialState: PreviewResources.coreState,

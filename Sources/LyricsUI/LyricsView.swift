@@ -58,13 +58,8 @@ public struct LyricsView: View {
                             .padding(.vertical, currentLineIndex == index ? 10 : 0)
                             .animation(.default, value: currentLineIndex == index)
                             .onTapGesture {
+                                scrollToLine(index: index)
                                 isAutoScrollEnabled = true
-                                let position = lyricsLines[index].position
-                                let playbackState = PlaybackState.playing(time: position)
-                                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
-                                coreStore.send(.progressingAction(action))
-
-                                onLyricsTap?(position)
                             }
                         }
                         .listRowBackground(Color.clear)
@@ -77,7 +72,7 @@ public struct LyricsView: View {
                     .background(Color.clear)
                     .scrollIndicators(.hidden)
                     .gesture(
-                        DragGesture()
+                        DragGesture(minimumDistance: 30)
                             .onChanged { _ in
                                 isAutoScrollEnabled = false
                             }
@@ -99,7 +94,6 @@ public struct LyricsView: View {
                     .onChange(of: showTranslation) { _ in
                         if let index = currentLineIndex {
                             scrollProxy.scrollTo(index, anchor: .center)
-                            isAutoScrollEnabled = true
                         }
                     }
                 }
@@ -109,6 +103,21 @@ public struct LyricsView: View {
 
     func addHalfHeightSpacer(_ geometry: GeometryProxy) -> some View {
         Spacer(minLength: geometry.size.height / 2)
+    }
+
+    /// Scroll to the index line.
+    public func scrollToLine(index: Int) {
+        if let progressing = coreStore.progressingState {
+            let lyricsLines = progressing.lyrics.lines
+            if index < lyricsLines.count {
+                let position = lyricsLines[index].position
+                let playbackState = PlaybackState.playing(time: position)
+                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
+                coreStore.send(.progressingAction(action))
+
+                onLyricsTap?(position)
+            }
+        }
     }
 }
 
