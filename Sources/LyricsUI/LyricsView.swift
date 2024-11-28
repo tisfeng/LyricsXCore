@@ -42,59 +42,70 @@ public struct LyricsView: View {
 
             GeometryReader { geometry in
                 ScrollViewReader { scrollProxy in
-                    List {
-                        addHalfHeightSpacer(geometry)
+                    ZStack(alignment: .topTrailing) {
+                        List {
+                            addHalfHeightSpacer(geometry)
 
-                        ForEach(lyricsLines.indices, id: \.self) { index in
-                            LyricsLineView(
-                                line: lyricsLines[index],
-                                showTranslation: showTranslation
-                            )
-                            .opacity(currentLineIndex == index ? 1 : 0.6)
-                            .scaleEffect(
-                                currentLineIndex == index ? 1 : 0.9,
-                                anchor: .topLeading
-                            )
-                            .padding(.vertical, currentLineIndex == index ? 10 : 0)
-                            .animation(.default, value: currentLineIndex == index)
-                            .onTapGesture {
-                                scrollToLine(index: index)
-                                isAutoScrollEnabled = true
+                            ForEach(lyricsLines.indices, id: \.self) { index in
+                                LyricsLineView(
+                                    line: lyricsLines[index],
+                                    showTranslation: showTranslation
+                                )
+                                .opacity(currentLineIndex == index ? 1 : 0.6)
+                                .scaleEffect(
+                                    currentLineIndex == index ? 1 : 0.9,
+                                    anchor: .topLeading
+                                )
+                                .padding(.vertical, currentLineIndex == index ? 10 : 0)
+                                .animation(.default, value: currentLineIndex == index)
+                                .onTapGesture {
+                                    scrollToLine(index: index)
+                                    isAutoScrollEnabled = true
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+
+                            addHalfHeightSpacer(geometry)
+                        }
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
+                        .background(Color.clear)
+                        .scrollIndicators(.hidden)
+                        .onChange(of: currentLineIndex) { index in
+                            if isAutoScrollEnabled, let index = index {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    scrollProxy.scrollTo(index, anchor: .center)
+                                }
                             }
                         }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-
-                        addHalfHeightSpacer(geometry)
-                    }
-                    .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
-                    .background(Color.clear)
-                    .scrollIndicators(.hidden)
-                    .gesture(
-                        DragGesture(minimumDistance: 30)
-                            .onChanged { _ in
-                                isAutoScrollEnabled = false
+                        .onChange(of: isAutoScrollEnabled) { enabled in
+                            if enabled, let index = currentLineIndex {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    scrollProxy.scrollTo(index, anchor: .center)
+                                }
                             }
-                    )
-                    .onChange(of: currentLineIndex) { index in
-                        if isAutoScrollEnabled, let index = index {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                        }
+                        .onChange(of: showTranslation) { _ in
+                            if let index = currentLineIndex {
                                 scrollProxy.scrollTo(index, anchor: .center)
                             }
                         }
-                    }
-                    .onChange(of: isAutoScrollEnabled) { enabled in
-                        if enabled, let index = currentLineIndex {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                scrollProxy.scrollTo(index, anchor: .center)
+
+                        Button(action: {
+                            withAnimation {
+                                isAutoScrollEnabled.toggle()
                             }
+                        }) {
+                            Image(
+                                systemName: isAutoScrollEnabled
+                                    ? "lock.fill" : "lock.open.fill"
+                            )
+                            .font(.title3)
+                            .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
                         }
-                    }
-                    .onChange(of: showTranslation) { _ in
-                        if let index = currentLineIndex {
-                            scrollProxy.scrollTo(index, anchor: .center)
-                        }
+                        .buttonStyle(.plain)
+                        .padding(.top)
                     }
                 }
             }

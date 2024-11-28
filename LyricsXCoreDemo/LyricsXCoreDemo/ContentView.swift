@@ -12,7 +12,7 @@ import LyricsXCore
 import LyricsUI
 
 struct ContentView: View {
-    @State var isAutoScrollEnabled = false
+    @State var isAutoScrollEnabled = true
 
     let store = Store(
         initialState: PreviewResources.coreState,
@@ -26,15 +26,15 @@ struct ContentView: View {
 
     var body: some View {
         let viewStore = ViewStore(store)
-
+        
         // Start progressing from current line
         viewStore.send(.progressingAction(.recalculateCurrentLineIndex))
 
         return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
             print("Tap position: \(position)")
         }
-            .environmentObject(viewStore)
-            .padding(.horizontal)
+        .environmentObject(viewStore)
+        .padding(.horizontal)
     }
 }
 
