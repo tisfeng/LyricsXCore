@@ -14,25 +14,52 @@ public struct LyricsLineView: View {
     
     public let line: LyricsLine
     
-    public var showTranslation: Bool
+    public let showTranslation: Bool
     
-    public init(line: LyricsLine, showTranslation: Bool) {
+    public let isCurrentLine: Bool
+    
+    @State private var karaokeView: KaraokeLyricsView?
+    
+    public init(line: LyricsLine, showTranslation: Bool = true, isCurrentLine: Bool = false) {
         self.line = line
         self.showTranslation = showTranslation
+        self.isCurrentLine = isCurrentLine
+    }
+    
+    public func startKaraokeAnimation() {
+        karaokeView?.startAnimation()
+    }
+    
+    public func stopKaraokeAnimation() {
+        karaokeView?.stopAnimation()
     }
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             KaraokeLyricsView(lyricsLine: line)
+                .onAppear {
+                    karaokeView = KaraokeLyricsView(lyricsLine: line)
 
-            Text(line.content)
-                .font(Font.title2.weight(.medium))
+                    if isCurrentLine {
+                        karaokeView?.startAnimation()
+                    }
+                }
+                .onChange(of: isCurrentLine) { isCurrent in
+                    if isCurrent {
+                        karaokeView?.startAnimation()
+                    } else {
+                        karaokeView?.stopAnimation()
+                    }
+                }
+
+//            Text(line.content)
+//                .font(Font.title2.weight(.medium))
 
             if showTranslation,
                // TODO: language code candidate
                let trans = line.attachments.translation() {
                 Text(trans)
-                    .font(Font.title2.weight(.medium))
+                    .font(Font.title3.weight(.medium))
             }
         }
     }
@@ -46,12 +73,14 @@ struct LyricsLineView_Previews: PreviewProvider {
         return Group {
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
-                showTranslation: true)
+                showTranslation: true,
+                isCurrentLine: true)
                     .previewLayout(.sizeThatFits)
             
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
-                showTranslation: false)
+                showTranslation: false,
+                isCurrentLine: false)
                     .previewLayout(.sizeThatFits)
         }
     }

@@ -5,18 +5,18 @@
 //  Created by tisfeng on 2024/11/28.
 //
 
-import SwiftUI
 import LyricsCore
+import SwiftUI
 
 public struct KaraokeLyricsView: View {
     public let lyricsLine: LyricsLine
     @State private var progress: Double = 0.0
     @State private var timer: Timer?
-    
+
     private var timeTagDuration: Double {
         // 获取最后一个时间标签的时间
         if let lastTag = lyricsLine.attachments.timetag?.tags.last {
-            return lastTag.time  // InlineTimeTag 已经处理了毫秒到秒的转换
+            return lastTag.time
         }
         return 0
     }
@@ -25,72 +25,91 @@ public struct KaraokeLyricsView: View {
         self.lyricsLine = lyricsLine
     }
 
-    public var body: some View {
-        VStack {
-            ZStack {
-                Text(lyricsLine.content)
-                    .foregroundColor(.gray.opacity(0.5))
-                    .font(.system(size: 24, weight: .medium))
-                    .multilineTextAlignment(.center)
+    public func startAnimation() {
+        progress = 0
+        timer?.invalidate()
 
-                Text(lyricsLine.content)
-                    .foregroundColor(.green)
-                    .font(.system(size: 24, weight: .medium))
-                    .multilineTextAlignment(.center)
-                    .mask(
-                        GeometryReader { geometry in
-                            Rectangle()
-                                .frame(width: geometry.size.width * progress)
-                        }
-                    )
+        guard let timeTags = lyricsLine.attachments.timetag?.tags, !timeTags.isEmpty else { return }
+        print("Time tags: \(timeTags)")
+
+        let totalDuration = timeTagDuration
+        guard totalDuration > 0 else { return }
+        print("Total duration: \(totalDuration)")
+
+        var elapsedTime: Double = 0
+
+        // 使用时间标签来更新进度
+        let updateInterval = 0.03  // 30fps
+        timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
+            elapsedTime += updateInterval
+            print("Elapsed time: \(elapsedTime)")
+
+            // 找到当前时间对应的字符位置
+            var currentProgress = 0.0
+
+            // 如果时间还没到第一个标签，使用线性插值
+            if elapsedTime < timeTags[0].time {
+                currentProgress = 0.0
             }
+            // 如果时间超过最后一个标签，设为最大进度
+            else if elapsedTime >= timeTags.last!.time {
+                currentProgress = 1.0
+            }
+            // 否则找到对应的时间区间
+            else {
+                for (index, tag) in timeTags.enumerated() {
+                    guard index < timeTags.count - 1 else { break }
+                    let nextTag = timeTags[index + 1]
 
-            Slider(value: $progress, in: 0...1)
-                .padding()
-
-            Button("播放动画") {
-                progress = 0
-                timer?.invalidate()
-                
-                guard let timeTags = lyricsLine.attachments.timetag?.tags, !timeTags.isEmpty else { return }
-                
-                let totalDuration = timeTagDuration
-                guard totalDuration > 0 else { return }
-                
-                // 使用时间标签来更新进度
-                let updateInterval = 0.03 // 30fps
-                timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
-                    let currentTime = progress * totalDuration
-                    
-                    // 找到当前时间对应的字符位置
-                    var currentProgress = 0.0
-                    for (index, tag) in timeTags.enumerated() {
-                        if currentTime >= tag.time {
-                            let nextTime = index < timeTags.count - 1 ? timeTags[index + 1].time : totalDuration
-                            let tagProgress = Double(tag.index) / Double(lyricsLine.content.count)
-                            let nextProgress = index < timeTags.count - 1 ? Double(timeTags[index + 1].index) / Double(lyricsLine.content.count) : 1.0
-                            
-                            // 计算当前字符内的插值进度
-                            if currentTime < nextTime {
-                                let percent = (currentTime - tag.time) / (nextTime - tag.time)
-                                currentProgress = tagProgress + (nextProgress - tagProgress) * percent
-                            }
-                        }
-                    }
-                    
-                    withAnimation(.linear(duration: updateInterval)) {
-                        progress = min(progress + updateInterval / totalDuration, 1.0)
+                    if elapsedTime >= tag.time && elapsedTime < nextTag.time {
+                        let segmentProgress = (elapsedTime - tag.time) / (nextTag.time - tag.time)
+                        let startProgress = Double(tag.index) / Double(lyricsLine.content.count)
+                        let endProgress = Double(nextTag.index) / Double(lyricsLine.content.count)
+                        currentProgress =
+                            startProgress + (endProgress - startProgress) * segmentProgress
+                        break
                     }
                 }
             }
-            .buttonStyle(.bordered)
+
+            print("Current progress: \(currentProgress)")
+            withAnimation(.linear(duration: updateInterval)) {
+                progress = currentProgress
+            }
+
+            if elapsedTime >= totalDuration {
+                timer.invalidate()
+            }
         }
-        .padding()
-        .onAppear {
-            progress = 0.0
+    }
+
+    public func stopAnimation() {
+        timer?.invalidate()
+        timer = nil
+        progress = 0
+    }
+
+    public var body: some View {
+        ZStack {
+            Text(lyricsLine.content)
+                .foregroundColor(.gray.opacity(0.5))
+                .font(Font.title2.weight(.medium))
+
+            Text(lyricsLine.content)
+                .foregroundColor(.green)
+                .font(Font.title2.weight(.medium))
+                .mask(
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .frame(width: geometry.size.width * progress)
+                    }
+                )
         }
         .onDisappear {
             timer?.invalidate()
+        }
+        .onAppear {
+            startAnimation()
         }
     }
 }

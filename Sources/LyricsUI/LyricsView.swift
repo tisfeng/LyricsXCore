@@ -49,7 +49,8 @@ public struct LyricsView: View {
                             ForEach(lyricsLines.indices, id: \.self) { index in
                                 LyricsLineView(
                                     line: lyricsLines[index],
-                                    showTranslation: showTranslation
+                                    showTranslation: showTranslation,
+                                    isCurrentLine: currentLineIndex == index
                                 )
                                 .opacity(currentLineIndex == index ? 1 : 0.6)
                                 .scaleEffect(
@@ -61,11 +62,6 @@ public struct LyricsView: View {
                                 .onTapGesture {
                                     playLyrics(at: index)
                                     scrollToIndex(index, proxy: scrollProxy)
-
-                                    // Wait for the animation to finish
-//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-//                                        isAutoScrollEnabled = true
-//                                    }
                                 }
                             }
                             .listRowBackground(Color.clear)
@@ -77,9 +73,21 @@ public struct LyricsView: View {
                         .scrollContentBackground(.hidden)
                         .background(Color.clear)
                         .scrollIndicators(.hidden)
-                        .onChange(of: currentLineIndex) { index in
-                            if isAutoScrollEnabled, let index = index {
-                                scrollToIndex(index, proxy: scrollProxy)
+                        .onChange(of: currentLineIndex) { [oldIndex = currentLineIndex] newIndex in
+                            if let oldIndex {
+                                // 停止旧行的动画
+//                                scrollProxy.scrollView.viewWithTag(oldIndex)?.value(forKey: "view")
+//                                    .map { ($0 as? LyricsLineView)?.stopKaraokeAnimation() }
+                            }
+                            
+                            if let newIndex {
+                                // 开始新行的动画
+//                                scrollProxy.scrollView.viewWithTag(newIndex)?.value(forKey: "view")
+//                                    .map { ($0 as? LyricsLineView)?.startKaraokeAnimation() }
+                                
+                                if isAutoScrollEnabled {
+                                    scrollToIndex(newIndex, proxy: scrollProxy)
+                                }
                             }
                         }
                         .onChange(of: isAutoScrollEnabled) { enabled in
