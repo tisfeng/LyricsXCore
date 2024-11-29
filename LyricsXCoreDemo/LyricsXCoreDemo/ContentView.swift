@@ -10,11 +10,12 @@ import SwiftUI
 import LyricsUIPreviewSupport
 import LyricsXCore
 import LyricsUI
+import MusicPlayer
 
 struct ContentView: View {
-    @State var isAutoScrollEnabled = true
+@State private var isAutoScrollEnabled = true
 
-    let store = Store(
+   private let store = Store(
         initialState: PreviewResources.coreState,
         reducer: Reducer(LyricsProgressingState.reduce)
             .optional()
@@ -24,17 +25,32 @@ struct ContentView: View {
                 environment: { $0 }),
         environment: .default)
 
+    private var viewStore: ViewStore<LyricsXCoreState, LyricsXCoreAction> {
+        ViewStore(store)
+    }
+
     var body: some View {
-        let viewStore = ViewStore(store)
-        
+
         // Start progressing from current line
         viewStore.send(.progressingAction(.recalculateCurrentLineIndex))
 
         return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
+            playLyrics(at: position)
             print("Tap position: \(position)")
         }
         .environmentObject(viewStore)
         .padding(.horizontal)
+    }
+
+    /// Play lyrics at position.
+    private func playLyrics(at position: TimeInterval) {
+        if let progressing = viewStore.progressingState {
+            if let _ = progressing.lyrics.lineIndex(at: position)  {
+                let playbackState = PlaybackState.playing(time: position)
+                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
+                viewStore.send(.progressingAction(action))
+            }
+        }
     }
 }
 

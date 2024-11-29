@@ -63,8 +63,11 @@ public struct LyricsView: View {
                                 .padding(.vertical, currentLineIndex == index ? 10 : 0)
                                 .animation(.default, value: currentLineIndex == index)
                                 .onTapGesture {
-                                    playLyrics(at: index)
                                     scrollToIndex(index, proxy: scrollProxy)
+
+                                    if let position = position(at: index) {
+                                        onLyricsTap?(position)
+                                    }
                                 }
                             }
                             .listRowBackground(Color.clear)
@@ -119,19 +122,16 @@ public struct LyricsView: View {
         Spacer(minLength: geometry.size.height / 2)
     }
 
-    /// Play lyrics at index.
-    private func playLyrics(at lineIndex: Int) {
+    /// Position at line index.
+    private func position(at lineIndex: Int) -> TimeInterval? {
         if let progressing = coreStore.progressingState {
             let lyricsLines = progressing.lyrics.lines
             if lineIndex < lyricsLines.count {
                 let position = lyricsLines[lineIndex].position
-                let playbackState = PlaybackState.playing(time: position)
-                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
-                coreStore.send(.progressingAction(action))
-
-                onLyricsTap?(position)
+                return position
             }
         }
+        return nil
     }
 
     /// Scroll to index with animation.
