@@ -73,18 +73,9 @@ public struct LyricsView: View {
                         .scrollContentBackground(.hidden)
                         .background(Color.clear)
                         .scrollIndicators(.hidden)
-                        .onChange(of: currentLineIndex) { [oldIndex = currentLineIndex] newIndex in
-                            if let oldIndex {
-                                // 停止旧行的动画
-//
-                            }
-                            
-                            if let newIndex {
-                                // 开始新行的动画
-                                
-                                if isAutoScrollEnabled {
-                                    scrollToIndex(newIndex, proxy: scrollProxy)
-                                }
+                        .onChange(of: currentLineIndex) { index in
+                            if let index, isAutoScrollEnabled {
+                                scrollToIndex(index, proxy: scrollProxy)
                             }
                         }
                         .onChange(of: isAutoScrollEnabled) { enabled in
