@@ -24,13 +24,16 @@ public struct LyricsView: View {
     public var isAutoScrollEnabled: Bool
     public var showTranslation: Bool
     public let onLyricsTap: ((TimeInterval) -> Void)?
+    private let showLockButton: Bool
 
     public init(
         isAutoScrollEnabled: Binding<Bool>,
+        showLockButton: Bool = true,
         showTranslation: Bool = true,
         onLyricsTap: ((TimeInterval) -> Void)? = nil
     ) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
+        self.showLockButton = showLockButton
         self.showTranslation = showTranslation
         self.onLyricsTap = onLyricsTap
     }
@@ -89,20 +92,22 @@ public struct LyricsView: View {
                             }
                         }
 
-                        Button(action: {
-                            withAnimation {
-                                isAutoScrollEnabled.toggle()
+                        if showLockButton {
+                            Button(action: {
+                                withAnimation {
+                                    isAutoScrollEnabled.toggle()
+                                }
+                            }) {
+                                Image(
+                                    systemName: isAutoScrollEnabled
+                                        ? "lock.fill" : "lock.open.fill"
+                                )
+                                .font(.title3)
+                                .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
                             }
-                        }) {
-                            Image(
-                                systemName: isAutoScrollEnabled
-                                    ? "lock.fill" : "lock.open.fill"
-                            )
-                            .font(.title3)
-                            .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
+                            .buttonStyle(.plain)
+                            .padding(.top)
                         }
-                        .buttonStyle(.plain)
-                        .padding(.top)
                     }
                 }
             }

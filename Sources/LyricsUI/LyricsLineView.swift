@@ -29,7 +29,7 @@ public struct LyricsLineView: View {
             if showTranslation,
                let trans = line.attachments.translation() {
                 Text(trans)
-                    .font(Font.title3.weight(.medium))
+                    .font(Font.title.weight(.medium))
             }
         }
     }

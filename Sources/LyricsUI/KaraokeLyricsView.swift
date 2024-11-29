@@ -98,7 +98,7 @@ public struct KaraokeLyricsView: View {
     /// Creates the base text view with common styling
     private var lyricstText: some View {
         Text(lyricsLine.content)
-            .font(Font.title2.weight(.medium))
+            .font(Font.title.weight(.medium))
     }
     
     public var body: some View {
