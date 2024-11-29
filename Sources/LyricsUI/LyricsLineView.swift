@@ -23,13 +23,16 @@ public struct LyricsLineView: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
+            KaraokeLyricsView(lyricsLine: line)
+
             Text(line.content)
-                .font(Font.title.bold())
+                .font(Font.title2.weight(.medium))
+
             if showTranslation,
                // TODO: language code candidate
                let trans = line.attachments.translation() {
                 Text(trans)
-                    .font(Font.title2.bold())
+                    .font(Font.title2.weight(.medium))
             }
         }
     }

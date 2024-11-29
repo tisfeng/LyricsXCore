@@ -16,8 +16,11 @@ struct LyricsXCoreDemoApp: App {
         WindowGroup {
 //            ContentView()
 
-            let lyricsLine = LyricsLine(content: "欲洁何曾洁，云空未必空。可怜金玉质，终陷淖泥中。", position: 0)
-            AnimatedLyricsView(lyricsLine: lyricsLine)
+            var lyricsLine = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
+            // 添加时间标签
+            let timeTagStr = "<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
+            lyricsLine.attachments.timetag = LyricsLine.Attachments.InlineTimeTag(timeTagStr)
+            return KaraokeLyricsView(lyricsLine: lyricsLine)
         }
     }
 }
