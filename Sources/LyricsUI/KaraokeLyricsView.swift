@@ -10,8 +10,9 @@ import SwiftUI
 
 public struct KaraokeLyricsView: View {
     public let lyricsLine: LyricsLine
-    @State private var progress: Double = 0.0
+    @State private var progress: Double
     @State private var timer: Timer?
+    private var isAnimating: Bool
 
     private var timeTagDuration: Double {
         // 获取最后一个时间标签的时间
@@ -21,8 +22,10 @@ public struct KaraokeLyricsView: View {
         return 0
     }
 
-    public init(lyricsLine: LyricsLine) {
+    public init(lyricsLine: LyricsLine, isAnimating: Bool = true) {
         self.lyricsLine = lyricsLine
+        self._progress = State(initialValue: 0.0)
+        self.isAnimating = isAnimating
     }
 
     public func startAnimation() {
@@ -30,19 +33,16 @@ public struct KaraokeLyricsView: View {
         timer?.invalidate()
 
         guard let timeTags = lyricsLine.attachments.timetag?.tags, !timeTags.isEmpty else { return }
-        print("Time tags: \(timeTags)")
 
         let totalDuration = timeTagDuration
         guard totalDuration > 0 else { return }
-        print("Total duration: \(totalDuration)")
 
         var elapsedTime: Double = 0
 
         // 使用时间标签来更新进度
-        let updateInterval = 0.03  // 30fps
+        let updateInterval = 0.1 // 更新频率
         timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
             elapsedTime += updateInterval
-            print("Elapsed time: \(elapsedTime)")
 
             // 找到当前时间对应的字符位置
             var currentProgress = 0.0
@@ -66,13 +66,12 @@ public struct KaraokeLyricsView: View {
                         let startProgress = Double(tag.index) / Double(lyricsLine.content.count)
                         let endProgress = Double(nextTag.index) / Double(lyricsLine.content.count)
                         currentProgress =
-                            startProgress + (endProgress - startProgress) * segmentProgress
+                        startProgress + (endProgress - startProgress) * segmentProgress
                         break
                     }
                 }
             }
 
-            print("Current progress: \(currentProgress)")
             withAnimation(.linear(duration: updateInterval)) {
                 progress = currentProgress
             }
@@ -92,7 +91,6 @@ public struct KaraokeLyricsView: View {
     public var body: some View {
         ZStack {
             Text(lyricsLine.content)
-                .foregroundColor(.gray.opacity(0.5))
                 .font(Font.title2.weight(.medium))
 
             Text(lyricsLine.content)
@@ -106,18 +104,27 @@ public struct KaraokeLyricsView: View {
                 )
         }
         .onDisappear {
-            timer?.invalidate()
+            stopAnimation()
         }
         .onAppear {
-            startAnimation()
+            if isAnimating {
+                startAnimation()
+            }
+        }
+        .onChange(of: isAnimating) { shouldAnimate in
+            if shouldAnimate {
+                startAnimation()
+            } else {
+                stopAnimation()
+            }
         }
     }
 }
 
 #Preview {
     var lyricsLine = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
-    // 添加时间标签
     let timeTagStr = "<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
-    lyricsLine.attachments.timetag = LyricsLine.Attachments.InlineTimeTag(timeTagStr)
-    return KaraokeLyricsView(lyricsLine: lyricsLine)
+    lyricsLine.attachments.timetag = .init(timeTagStr)
+    let karaokeLyricsView = KaraokeLyricsView(lyricsLine: lyricsLine, isAnimating: true)
+    return karaokeLyricsView
 }

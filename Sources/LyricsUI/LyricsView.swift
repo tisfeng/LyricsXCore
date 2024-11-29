@@ -76,14 +76,11 @@ public struct LyricsView: View {
                         .onChange(of: currentLineIndex) { [oldIndex = currentLineIndex] newIndex in
                             if let oldIndex {
                                 // 停止旧行的动画
-//                                scrollProxy.scrollView.viewWithTag(oldIndex)?.value(forKey: "view")
-//                                    .map { ($0 as? LyricsLineView)?.stopKaraokeAnimation() }
+//
                             }
                             
                             if let newIndex {
                                 // 开始新行的动画
-//                                scrollProxy.scrollView.viewWithTag(newIndex)?.value(forKey: "view")
-//                                    .map { ($0 as? LyricsLineView)?.startKaraokeAnimation() }
                                 
                                 if isAutoScrollEnabled {
                                     scrollToIndex(newIndex, proxy: scrollProxy)
