@@ -45,8 +45,8 @@ public struct KaraokeLyricsView: View {
         dispatchTimer = nil
 
         guard let timeTags = lyricsLine.attachments.timetag?.tags,
-              !timeTags.isEmpty,
-              timeTagDuration > 0
+            !timeTags.isEmpty,
+            timeTagDuration > 0
         else { return }
 
         var elapsedTime: Double = 0
@@ -107,9 +107,14 @@ public struct KaraokeLyricsView: View {
 
     /// Stops the karaoke animation and resets progress
     public func stopAnimation() {
+        progress = 0
         dispatchTimer?.cancel()
         dispatchTimer = nil
-        progress = 0
+    }
+
+    /// Pauses the karaoke animation
+    public func pauseAnimation() {
+        dispatchTimer?.suspend()
     }
 
     /// Creates the base text view with common styling
@@ -119,11 +124,22 @@ public struct KaraokeLyricsView: View {
             .fixedSize(horizontal: true, vertical: false)
     }
 
+    /// Update animation state based on playing status
+    public func updateAnimationState(isPlayingLine: Bool, isPlaying: Bool) {
+        if !isPlayingLine {
+            stopAnimation()
+            return
+        }
+
+        if isPlaying {
+            startAnimation()
+        } else {
+            pauseAnimation()
+        }
+    }
 
     public var body: some View {
         lyricstText
-            .font(.system(size: 16))
-            .lineLimit(1)
             .overlay(
                 lyricstText
                     .foregroundColor(.green)
@@ -136,28 +152,13 @@ public struct KaraokeLyricsView: View {
                     )
             )
             .onAppear {
-                // Only start animation if this is the playing line and playback is active
-                if isPlayingLine && isPlaying {
-                    startAnimation()
-                }
+                updateAnimationState(isPlayingLine: isPlayingLine, isPlaying: isPlaying)
             }
             .onChange(of: isPlayingLine) { newValue in
-                if !newValue {
-                    progress = 0
-                    stopAnimation()
-                } else if isPlaying {
-                    startAnimation()
-                }
+                updateAnimationState(isPlayingLine: newValue, isPlaying: isPlaying)
             }
-            .onChange(of: isPlaying) { shouldPlay in
-                if !isPlayingLine {
-                    progress = 0
-                    stopAnimation()
-                } else if shouldPlay {
-                    startAnimation()
-                } else {
-                    stopAnimation()
-                }
+            .onChange(of: isPlaying) { newValue in
+                updateAnimationState(isPlayingLine: isPlayingLine, isPlaying: newValue)
             }
     }
 }
