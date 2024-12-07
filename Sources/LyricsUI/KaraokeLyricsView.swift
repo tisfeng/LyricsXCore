@@ -11,10 +11,11 @@ import SwiftUI
 /// A view that displays karaoke-style animated lyrics with time-synchronized highlighting
 public struct KaraokeLyricsView: View {
     public let lyricsLine: LyricsLine
+    private let isPlaying: Bool
+
     @State private var progress: Double = 0
-    @State private var timer: Timer?
-    private let isAnimating: Bool
-    
+    @State private var dispatchTimer: DispatchSourceTimer?
+
     /// The total duration of the lyrics line animation, calculated from the last time tag
     private var timeTagDuration: Double {
         guard let lastTag = lyricsLine.attachments.timetag?.tags.last else { return 0 }
@@ -24,16 +25,17 @@ public struct KaraokeLyricsView: View {
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
-    ///   - isAnimating: Whether the view should start animating immediately
-    public init(lyricsLine: LyricsLine, isAnimating: Bool = true) {
+    ///   - isPlaying: Whether the view should start playing immediately
+    public init(lyricsLine: LyricsLine, isPlaying: Bool = true) {
         self.lyricsLine = lyricsLine
-        self.isAnimating = isAnimating
+        self.isPlaying = isPlaying
     }
     
     /// Starts the karaoke animation
     public func startAnimation() {
         progress = 0
-        timer?.invalidate()
+        dispatchTimer?.cancel()
+        dispatchTimer = nil
         
         guard let timeTags = lyricsLine.attachments.timetag?.tags,
               !timeTags.isEmpty,
@@ -42,7 +44,9 @@ public struct KaraokeLyricsView: View {
         var elapsedTime: Double = 0
         let updateInterval = 0.1 // Animation update interval in seconds
         
-        timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
+        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+        timer.schedule(deadline: .now(), repeating: .milliseconds(Int(updateInterval * 1000)))
+        timer.setEventHandler {
             elapsedTime += updateInterval
             let currentProgress = calculateProgress(at: elapsedTime, with: timeTags)
             
@@ -51,9 +55,12 @@ public struct KaraokeLyricsView: View {
             }
             
             if elapsedTime >= timeTagDuration {
-                timer.invalidate()
+                timer.cancel()
+                dispatchTimer = nil
             }
         }
+        dispatchTimer = timer
+        timer.resume()
     }
     
     /// Calculates the progress value for the current elapsed time
@@ -90,8 +97,8 @@ public struct KaraokeLyricsView: View {
     
     /// Stops the karaoke animation and resets progress
     public func stopAnimation() {
-        timer?.invalidate()
-        timer = nil
+        dispatchTimer?.cancel()
+        dispatchTimer = nil
         progress = 0
     }
     
@@ -119,12 +126,12 @@ public struct KaraokeLyricsView: View {
                 stopAnimation()
             }
             .onAppear {
-                if isAnimating {
+                if isPlaying {
                     startAnimation()
                 }
             }
-            .onChange(of: isAnimating) { shouldAnimate in
-                if shouldAnimate {
+            .onChange(of: isPlaying) { shouldPlay in
+                if shouldPlay {
                     startAnimation()
                 } else {
                     stopAnimation()
@@ -137,5 +144,5 @@ public struct KaraokeLyricsView: View {
     var lyricsLine = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
     let timeTagStr = "<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
     lyricsLine.attachments.timetag = .init(timeTagStr)
-    return KaraokeLyricsView(lyricsLine: lyricsLine, isAnimating: true)
+    return KaraokeLyricsView(lyricsLine: lyricsLine, isPlaying: true)
 }

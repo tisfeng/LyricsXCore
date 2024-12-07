@@ -14,17 +14,17 @@ public struct LyricsLineView: View {
     
     public let line: LyricsLine
     public let showTranslation: Bool
-    public let isCurrentLine: Bool
+    public let isPlaying: Bool
 
-    public init(line: LyricsLine, showTranslation: Bool = true, isCurrentLine: Bool = false) {
+    public init(line: LyricsLine, showTranslation: Bool = true, isPlaying: Bool = false) {
         self.line = line
         self.showTranslation = showTranslation
-        self.isCurrentLine = isCurrentLine
+        self.isPlaying = isPlaying
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            KaraokeLyricsView(lyricsLine: line, isAnimating: isCurrentLine)
+            KaraokeLyricsView(lyricsLine: line, isPlaying: isPlaying)
 
             if showTranslation,
                let trans = line.attachments.translation() {
@@ -45,13 +45,13 @@ struct LyricsLineView_Previews: PreviewProvider {
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
                 showTranslation: true,
-                isCurrentLine: true)
+                isPlaying: true)
                     .previewLayout(.sizeThatFits)
             
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
                 showTranslation: false,
-                isCurrentLine: false)
+                isPlaying: false)
                     .previewLayout(.sizeThatFits)
         }
     }

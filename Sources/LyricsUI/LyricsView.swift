@@ -53,7 +53,7 @@ public struct LyricsView: View {
                                 LyricsLineView(
                                     line: lyricsLines[index],
                                     showTranslation: showTranslation,
-                                    isCurrentLine: currentLineIndex == index
+                                    isPlaying: currentLineIndex == index
                                 )
                                 .opacity(currentLineIndex == index ? 1 : 0.6)
                                 .scaleEffect(
