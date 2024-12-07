@@ -40,6 +40,22 @@ public struct LyricsView: View {
         self.onLyricsTap = onLyricsTap
     }
 
+//    var lyricsLine: LyricsLine {
+//        var lyricsLine = lyricsLines[index]
+//        lyricsLine.lyrics = progressing.lyrics
+//        return lyricsLine
+//
+//    }
+
+    func lyricsLine(at index: Int) -> LyricsLine? {
+        if let progressing = coreStore.progressingState {
+            var lyricsLine = progressing.lyrics[index]
+            lyricsLine.lyrics = progressing.lyrics
+            return lyricsLine
+        }
+        return nil
+    }
+
     public var body: some View {
         if let progressing = coreStore.progressingState {
             let currentLineIndex = progressing.currentLineIndex
@@ -53,7 +69,7 @@ public struct LyricsView: View {
 
                             ForEach(lyricsLines.indices, id: \.self) { index in
                                 LyricsLineView(
-                                    line: lyricsLines[index],
+                                    line: lyricsLine(at: index)!,
                                     showTranslation: showTranslation,
                                     isPlayingLine: currentLineIndex == index,
                                     isPlaying: isPlaying
