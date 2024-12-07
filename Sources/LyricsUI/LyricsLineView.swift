@@ -14,17 +14,27 @@ public struct LyricsLineView: View {
     
     public let line: LyricsLine
     public let showTranslation: Bool
+    public let isPlayingLine: Bool
     public let isPlaying: Bool
 
-    public init(line: LyricsLine, showTranslation: Bool = true, isPlaying: Bool = false) {
+    public init(
+        line: LyricsLine,
+        showTranslation: Bool = true,
+        isPlayingLine: Bool = false,
+        isPlaying: Bool = false) {
         self.line = line
         self.showTranslation = showTranslation
+        self.isPlayingLine = isPlayingLine
         self.isPlaying = isPlaying
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            KaraokeLyricsView(lyricsLine: line, isPlaying: isPlaying)
+            KaraokeLyricsView(
+                lyricsLine: line,
+                isPlayingLine: isPlayingLine,
+                isPlaying: isPlaying
+            )
 
             if showTranslation,
                let trans = line.attachments.translation() {

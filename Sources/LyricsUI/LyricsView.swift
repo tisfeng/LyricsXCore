@@ -26,6 +26,8 @@ public struct LyricsView: View {
     public let onLyricsTap: ((TimeInterval) -> Void)?
     private let showLockButton: Bool
 
+    @State var isPlaying = true
+
     public init(
         isAutoScrollEnabled: Binding<Bool>,
         showLockButton: Bool = true,
@@ -53,7 +55,8 @@ public struct LyricsView: View {
                                 LyricsLineView(
                                     line: lyricsLines[index],
                                     showTranslation: showTranslation,
-                                    isPlaying: currentLineIndex == index
+                                    isPlayingLine: currentLineIndex == index,
+                                    isPlaying: isPlaying
                                 )
                                 .opacity(currentLineIndex == index ? 1 : 0.6)
                                 .scaleEffect(
@@ -95,18 +98,37 @@ public struct LyricsView: View {
                             }
                         }
 
-                        if showLockButton {
+                        VStack {
+                            if showLockButton {
+                                Button(action: {
+                                    withAnimation {
+                                        isAutoScrollEnabled.toggle()
+                                    }
+                                }) {
+                                    Image(
+                                        systemName: isAutoScrollEnabled
+                                        ? "lock.fill" : "lock.open.fill"
+                                    )
+                                    .font(.title3)
+                                    .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top)
+                            }
+
                             Button(action: {
                                 withAnimation {
-                                    isAutoScrollEnabled.toggle()
+                                    isPlaying.toggle()
+
+                                    let position = progressing.playbackState.time
+                                    coreStore.send(.progressingAction(.playbackStateUpdated(
+                                        isPlaying ? .playing(time: position) : .paused(time: position)
+                                    )))
                                 }
                             }) {
-                                Image(
-                                    systemName: isAutoScrollEnabled
-                                        ? "lock.fill" : "lock.open.fill"
-                                )
-                                .font(.title3)
-                                .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
+                                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.title3)
+                                    .foregroundColor(isPlaying ? .blue : .gray)
                             }
                             .buttonStyle(.plain)
                             .padding(.top)
