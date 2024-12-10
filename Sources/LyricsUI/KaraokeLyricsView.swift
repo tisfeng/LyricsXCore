@@ -50,9 +50,23 @@ public struct KaraokeLyricsView: View {
             !timeTags.isEmpty,
             timeTagDuration > 0
         else { return }
-
-        withAnimation(.linear(duration: 0.1)) {
-            progress = calculateProgress(at: position, with: timeTags)
+        
+        let newProgress = calculateProgress(at: position, with: timeTags)
+        
+        // Don't animate when:
+        // 1. Progress is resetting from 1 to 0 (line finished)
+        // 2. Progress is jumping backwards (seeking)
+        // 3. Progress is jumping forwards significantly (seeking)
+        let shouldAnimate = !(progress == 1 && newProgress == 0) && // Not resetting
+            !(newProgress < progress) && // Not seeking backwards
+            !(newProgress - progress > 0.1) // Not seeking forwards significantly
+        
+        if shouldAnimate {
+            withAnimation(.linear(duration: 0.1)) {
+                progress = newProgress
+            }
+        } else {
+            progress = newProgress
         }
     }
 
