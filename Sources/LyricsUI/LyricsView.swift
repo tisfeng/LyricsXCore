@@ -14,6 +14,8 @@ import LyricsXCore
 import MusicPlayer
 import SwiftUI
 
+let lyricsFont = Font.title2.weight(.medium)
+
 @available(macOS 13.0, *)
 public struct LyricsView: View {
 
@@ -43,14 +45,6 @@ public struct LyricsView: View {
         self.onLyricsTap = onLyricsTap
     }
 
-    func lyricsLine(at index: Int) -> LyricsLine? {
-        if let progressing = coreStore.progressingState {
-            var lyricsLine = progressing.lyrics[index]
-            lyricsLine.lyrics = progressing.lyrics
-            return lyricsLine
-        }
-        return nil
-    }
 
     public var body: some View {
         if let progressing = coreStore.progressingState {
@@ -61,17 +55,26 @@ public struct LyricsView: View {
                 ScrollViewReader { scrollProxy in
                     ZStack(alignment: .topTrailing) {
                         List {
-                            addHalfHeightSpacer(geometry)
+                            halfHeightSpacer(geometry)
 
                             ForEach(lyricsLines.indices, id: \.self) { index in
-                                LyricsLineView(
-                                    line: lyricsLine(at: index)!,
-                                    showTranslation: showTranslation,
-                                    isPlayingLine: currentLineIndex == index,
-                                    isPlaying: isPlaying,
-                                    position: position
-                                )
-                                .opacity(currentLineIndex == index ? 1 : 0.6)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    let line = lyricsLine(at: index)!
+                                    KaraokeLyricsView(
+                                        lyricsLine: line,
+                                        isPlayingLine: currentLineIndex == index,
+                                        isPlaying: isPlaying,
+                                        position: position
+                                    )
+
+                                    if showTranslation,
+                                       let trans = line.attachments.translation() {
+                                        Text(trans)
+                                            .font(lyricsFont)
+                                            .fixedSize(horizontal: true, vertical: false)
+                                            .opacity(currentLineIndex == index ? 1 : 0.6)
+                                    }
+                                }
                                 .scaleEffect(
                                     currentLineIndex == index ? 1 : 0.9,
                                     anchor: .topLeading
@@ -91,7 +94,7 @@ public struct LyricsView: View {
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
 
-                            addHalfHeightSpacer(geometry)
+                            halfHeightSpacer(geometry)
                         }
                         .listStyle(PlainListStyle())
                         .scrollContentBackground(.hidden)
@@ -157,8 +160,8 @@ public struct LyricsView: View {
         }
     }
 
-    /// Add half height spacer.
-    private func addHalfHeightSpacer(_ geometry: GeometryProxy) -> some View {
+    /// Half height spacer.
+    private func halfHeightSpacer(_ geometry: GeometryProxy) -> some View {
         Spacer(minLength: geometry.size.height / 2)
     }
 
@@ -179,6 +182,16 @@ public struct LyricsView: View {
         withAnimation(.easeInOut) {
             proxy.scrollTo(index, anchor: .center)
         }
+    }
+
+    /// Lyrics line at index, with lyrics.
+    private func lyricsLine(at index: Int) -> LyricsLine? {
+        if let progressing = coreStore.progressingState {
+            var lyricsLine = progressing.lyrics[index]
+            lyricsLine.lyrics = progressing.lyrics
+            return lyricsLine
+        }
+        return nil
     }
 }
 

@@ -13,10 +13,9 @@ public struct KaraokeLyricsView: View {
     public let lyricsLine: LyricsLine
     private let isPlayingLine: Bool
     private let isPlaying: Bool
-
     private var position: TimeInterval
 
-    @State private var progress: Double = 0
+    @State private var progress = 0.0
 
     /// The total duration of the lyrics line animation, calculated from the last time tag
     private var timeTagDuration: TimeInterval {
@@ -116,7 +115,7 @@ public struct KaraokeLyricsView: View {
             let segmentProgress = (relativePosition - lastTagTime) / (nextTagTime - lastTagTime)
             let startProgress = Double(lastMatchIndex + 1) / Double(timeTags.count)
             let endProgress = Double(lastMatchIndex + 2) / Double(timeTags.count)
-            
+
             return startProgress + (endProgress - startProgress) * segmentProgress
         }
         
@@ -127,7 +126,7 @@ public struct KaraokeLyricsView: View {
     /// Creates the base text view with common styling
     private var lyricstText: some View {
         Text(lyricsLine.content)
-            .font(Font.title2.weight(.medium))
+            .font(lyricsFont)
             .fixedSize(horizontal: true, vertical: false)
     }
 
@@ -145,6 +144,7 @@ public struct KaraokeLyricsView: View {
                         .clipped()
                 }
             )
+            .opacity((progress > 0 && progress <= 1) ? 1 : 0.6)
             .onAppear {
                 updateProgress(position: position)
             }
