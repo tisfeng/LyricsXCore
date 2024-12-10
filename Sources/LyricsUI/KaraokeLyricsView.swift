@@ -144,11 +144,64 @@ public struct KaraokeLyricsView: View {
     }
 }
 
-#Preview {
-    let position = 29.874
-    var lyricsLine = LyricsLine(content: "一幽风飞散发披肩", position: position)
-    let timeTagStr =
-        "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
-    lyricsLine.attachments.timetag = .init(timeTagStr)
-    return KaraokeLyricsView(lyricsLine: lyricsLine, playingPosition: position)
+// MARK: - Previews
+
+extension LyricsLine {
+    static func previewLine() -> LyricsLine {
+        let position = 29.874
+        var line = LyricsLine(content: "一幽风飞散发披肩", position: position)
+        let timeTagStr =
+            "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
+        line.attachments.timetag = .init(timeTagStr)
+        return line
+    }
+}
+
+// Preview helper view to simulate playback
+struct KaraokeLyricsPreview: View {
+    let lyricsLine: LyricsLine
+    @State private var playingPosition: TimeInterval
+    
+    init(lyricsLine: LyricsLine, startPosition: TimeInterval) {
+        self.lyricsLine = lyricsLine
+        self._playingPosition = State(initialValue: startPosition)
+    }
+    
+    var body: some View {
+        KaraokeLyricsView(lyricsLine: lyricsLine, playingPosition: playingPosition)
+            .padding()
+            .onAppear {
+                Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                    playingPosition += 0.1
+                    if let nextLine = lyricsLine.nextLine(), playingPosition >= nextLine.position {
+                        playingPosition = lyricsLine.position
+                    }
+                }
+            }
+    }
+}
+
+#Preview("Static") {
+    let line = LyricsLine.previewLine()
+    return KaraokeLyricsView(lyricsLine: line, playingPosition: line.position)
+        .padding()
+}
+
+#Preview("Progress States") {
+    let line = LyricsLine.previewLine()
+    return VStack(spacing: 20) {
+        KaraokeLyricsView(lyricsLine: line, playingPosition: line.position)
+
+        KaraokeLyricsView(lyricsLine: line, playingPosition: line.position + 1.0)
+
+        KaraokeLyricsView(lyricsLine: line, playingPosition: line.position + 3.0)
+
+        KaraokeLyricsView(lyricsLine: line, playingPosition: line.position + 7.0)
+    }
+    .padding()
+}
+
+#Preview("Animation") {
+    let line = LyricsLine.previewLine()
+    return KaraokeLyricsPreview(lyricsLine: line, startPosition: line.position)
 }
