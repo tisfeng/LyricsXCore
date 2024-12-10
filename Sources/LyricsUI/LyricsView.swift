@@ -28,6 +28,9 @@ public struct LyricsView: View {
 
     @State var isPlaying = true
 
+    @State var position: TimeInterval = 0
+    private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+
     public init(
         isAutoScrollEnabled: Binding<Bool>,
         showLockButton: Bool = true,
@@ -39,13 +42,6 @@ public struct LyricsView: View {
         self.showTranslation = showTranslation
         self.onLyricsTap = onLyricsTap
     }
-
-//    var lyricsLine: LyricsLine {
-//        var lyricsLine = lyricsLines[index]
-//        lyricsLine.lyrics = progressing.lyrics
-//        return lyricsLine
-//
-//    }
 
     func lyricsLine(at index: Int) -> LyricsLine? {
         if let progressing = coreStore.progressingState {
@@ -72,7 +68,8 @@ public struct LyricsView: View {
                                     line: lyricsLine(at: index)!,
                                     showTranslation: showTranslation,
                                     isPlayingLine: currentLineIndex == index,
-                                    isPlaying: isPlaying
+                                    isPlaying: isPlaying,
+                                    position: position
                                 )
                                 .opacity(currentLineIndex == index ? 1 : 0.6)
                                 .scaleEffect(
@@ -87,6 +84,8 @@ public struct LyricsView: View {
                                     if let position = position(at: index) {
                                         onLyricsTap?(position)
                                     }
+
+                                    isPlaying = progressing.playbackState.isPlaying
                                 }
                             }
                             .listRowBackground(Color.clear)
@@ -112,6 +111,9 @@ public struct LyricsView: View {
                             if let index = currentLineIndex {
                                 scrollToIndex(index, proxy: scrollProxy)
                             }
+                        }
+                        .onReceive(timer) { _ in
+                            position = progressing.playbackState.time
                         }
 
                         VStack {

@@ -16,16 +16,20 @@ public struct LyricsLineView: View {
     public let showTranslation: Bool
     public let isPlayingLine: Bool
     public let isPlaying: Bool
+    public let position: TimeInterval
 
     public init(
         line: LyricsLine,
         showTranslation: Bool = true,
         isPlayingLine: Bool = false,
-        isPlaying: Bool = false) {
+        isPlaying: Bool = false,
+        position: TimeInterval
+    ) {
         self.line = line
         self.showTranslation = showTranslation
         self.isPlayingLine = isPlayingLine
         self.isPlaying = isPlaying
+        self.position = position
     }
 
     public var body: some View {
@@ -33,7 +37,8 @@ public struct LyricsLineView: View {
             KaraokeLyricsView(
                 lyricsLine: line,
                 isPlayingLine: isPlayingLine,
-                isPlaying: isPlaying
+                isPlaying: isPlaying,
+                position: position
             )
 
             if showTranslation,
@@ -55,13 +60,17 @@ struct LyricsLineView_Previews: PreviewProvider {
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
                 showTranslation: true,
-                isPlaying: true)
+                isPlaying: true,
+                position: 0
+            )
                     .previewLayout(.sizeThatFits)
             
             LyricsLineView(
                 line: PreviewResources.lyricsLine,
                 showTranslation: false,
-                isPlaying: false)
+                isPlaying: false,
+                position: 0
+            )
                     .previewLayout(.sizeThatFits)
         }
     }

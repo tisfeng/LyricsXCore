@@ -35,22 +35,30 @@ struct ContentView: View {
         viewStore.send(.progressingAction(.recalculateCurrentLineIndex))
 
         return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
-            playLyrics(at: position)
+            seekTo(position: position)
             print("Tap position: \(position)")
         }
         .environmentObject(viewStore)
         .padding(.horizontal)
     }
 
-    /// Play lyrics at position.
-    private func playLyrics(at position: TimeInterval) {
+    /// Seek to position.
+    public func seekTo(position: TimeInterval) {
         if let progressing = viewStore.progressingState {
-            if let _ = progressing.lyrics.lineIndex(at: position)  {
-                let playbackState = PlaybackState.playing(time: position)
+            if progressing.lyrics.lineIndex(at: position) != nil {
+                let playbackState = playbackState(at: position)
                 let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
                 viewStore.send(.progressingAction(action))
             }
         }
+    }
+
+    /// Play back state at position.
+    public func playbackState(at position: TimeInterval) -> MusicPlayer.PlaybackState {
+        if let isPlaying = viewStore.progressingState?.playbackState.isPlaying {
+            return isPlaying ? .playing(time: position) : .paused(time: position)
+        }
+        return .paused(time: position)
     }
 }
 
