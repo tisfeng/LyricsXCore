@@ -29,8 +29,8 @@ public struct LyricsView: View {
     private let showLockButton: Bool
 
     @State var isPlaying = true
+    @State var position = 0.0
 
-    @State var position: TimeInterval = 0
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
 
     public init(
@@ -44,7 +44,6 @@ public struct LyricsView: View {
         self.showTranslation = showTranslation
         self.onLyricsTap = onLyricsTap
     }
-
 
     public var body: some View {
         if let progressing = coreStore.progressingState {
@@ -60,12 +59,7 @@ public struct LyricsView: View {
                             ForEach(lyricsLines.indices, id: \.self) { index in
                                 VStack(alignment: .leading, spacing: 6) {
                                     let line = lyricsLine(at: index)!
-                                    KaraokeLyricsView(
-                                        lyricsLine: line,
-                                        isPlayingLine: currentLineIndex == index,
-                                        isPlaying: isPlaying,
-                                        position: position
-                                    )
+                                    KaraokeLyricsView(lyricsLine: line, playingPosition: position)
 
                                     if showTranslation,
                                        let trans = line.attachments.translation() {

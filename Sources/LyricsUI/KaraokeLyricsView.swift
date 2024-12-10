@@ -10,10 +10,8 @@ import SwiftUI
 
 /// A view that displays karaoke-style animated lyrics with time-synchronized highlighting
 public struct KaraokeLyricsView: View {
-    public let lyricsLine: LyricsLine
-    private let isPlayingLine: Bool
-    private let isPlaying: Bool
-    private var position: TimeInterval
+    private let lyricsLine: LyricsLine
+    private let playingPosition: TimeInterval
 
     @State private var progress = 0.0
 
@@ -26,21 +24,13 @@ public struct KaraokeLyricsView: View {
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
-    ///   - isPlayingLine: Whether this line is the currently playing line
-    ///   - isPlaying: Whether the view should start playing immediately
     ///   - position: The current playback position relative to the line start
     public init(
         lyricsLine: LyricsLine,
-        isPlayingLine: Bool = false,
-        isPlaying: Bool = true,
-        position: TimeInterval
+        playingPosition: TimeInterval
     ) {
         self.lyricsLine = lyricsLine
-        self.isPlayingLine = isPlayingLine
-        self.isPlaying = isPlaying
-        self.position = position
-
-//        print("KaraokeLyricsView init: lyricsLine=\(lyricsLine.content), isPlayingLine=\(isPlayingLine), isPlaying=\(isPlaying), position=\(position)")
+        self.playingPosition = playingPosition
     }
 
     /// Update the progress based on current position
@@ -145,17 +135,11 @@ public struct KaraokeLyricsView: View {
                 }
             )
             .opacity((progress > 0 && progress <= 1) ? 1 : 0.6)
-            .onAppear {
-                updateProgress(position: position)
-            }
-            .onChange(of: position) { newValue in
+            .onChange(of: playingPosition) { newValue in
                 updateProgress(position: newValue)
             }
-            .onChange(of: isPlayingLine) { newValue in
-                updateProgress(position: position)
-            }
-            .onChange(of: isPlaying) { newValue in
-                updateProgress(position: position)
+            .onAppear {
+                updateProgress(position: playingPosition)
             }
     }
 }
@@ -166,5 +150,5 @@ public struct KaraokeLyricsView: View {
     let timeTagStr =
         "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
     lyricsLine.attachments.timetag = .init(timeTagStr)
-    return KaraokeLyricsView(lyricsLine: lyricsLine, isPlaying: true, position: position)
+    return KaraokeLyricsView(lyricsLine: lyricsLine, playingPosition: position)
 }
