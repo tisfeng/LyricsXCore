@@ -59,26 +59,34 @@ public struct KaraokeLyricsView: View {
         }
     }
 
-    /// Calculates the progress value for the current position
+    /// Calculates the progress value for the current position in range 0...1
+    /// - Parameters:
+    ///   - position: The global playback position
+    ///   - timeTags: Array of time tags containing timing and index information
+    /// - Returns: Progress value between 0 and 1, representing the karaoke highlight progress
     private func calculateProgress(
-        at position: Double, with timeTags: [LyricsLine.Attachments.InlineTimeTag.Tag]
+        at position: Double,
+        with timeTags: [LyricsLine.Attachments.InlineTimeTag.Tag]
     ) -> Double {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
         
-        // If we're before the line start, return 0
+        // If the position is before the line start, return 0
         if relativePosition < 0 {
             return 0
         }
-        
-        // If we're at the next line, return 0
-        if let nextLine = lyricsLine.nextLine() {
-            if position >= nextLine.position {
-                return 0
-            }
+
+        // If the position is at or after the next line start, return 0
+        if let nextLine = lyricsLine.nextLine(), position >= nextLine.position {
+            return 0
         }
+
+        if timeTags.isEmpty { return 0 }
         
-        // Find the last time tag that's before or at the current position
+        // The final character index, used for progress normalization
+        let finalTagIndex = timeTags.last?.index ?? lyricsLine.content.count
+        
+        // Find the time tag pair that surrounds the current position
         var lastMatchIndex = 0
         for (index, tag) in timeTags.enumerated() {
             if tag.time > relativePosition {
@@ -87,30 +95,31 @@ public struct KaraokeLyricsView: View {
             lastMatchIndex = index
         }
         
-        // Calculate progress based on the last matching tag
-        let lastTag = timeTags[lastMatchIndex]
-        let lastTagTime = lastTag.time
+        let previousTag = timeTags[lastMatchIndex]
+        let previousTagTime = previousTag.time
+        let previousTagIndex = previousTag.index
         
-        // If we're exactly at a tag, use its index directly
-        if lastTagTime == relativePosition {
-            return Double(lastMatchIndex + 1) / Double(timeTags.count)
+        // Handle the case when we're at or after the final tag
+        if lastMatchIndex == timeTags.count - 1 {
+            // If we've passed the final tag time, show full progress
+            // Otherwise, show progress up to the final tag's index
+            return relativePosition >= previousTagTime ? 1.0 : Double(previousTagIndex) / Double(finalTagIndex)
         }
         
-        // If we're between tags, interpolate between them
-        if lastMatchIndex < timeTags.count - 1 {
-            let nextTag = timeTags[lastMatchIndex + 1]
-            let nextTagTime = nextTag.time
-            
-            // Calculate progress between the two tags
-            let segmentProgress = (relativePosition - lastTagTime) / (nextTagTime - lastTagTime)
-            let startProgress = Double(lastMatchIndex + 1) / Double(timeTags.count)
-            let endProgress = Double(lastMatchIndex + 2) / Double(timeTags.count)
+        // Get the next tag for interpolation
+        let nextTag = timeTags[lastMatchIndex + 1]
+        let nextTagTime = nextTag.time
+        let nextTagIndex = nextTag.index
+        
+        // Calculate progress by interpolating between the two tags:
+        // 1. Calculate how far we are between the two tags (0...1)
+        let segmentProgress = (relativePosition - previousTagTime) / (nextTagTime - previousTagTime)
 
-            return startProgress + (endProgress - startProgress) * segmentProgress
-        }
-        
-        // If we're past the last tag, return 1
-        return 1.0
+        // 2. Interpolate between the two character indices
+        let interpolationIndex = Double(previousTagIndex) + segmentProgress * Double(nextTagIndex - previousTagIndex)
+
+        // 3. Normalize to 0...1 range using the final character index
+        return interpolationIndex / Double(finalTagIndex)
     }
 
     /// Creates the base text view with common styling
