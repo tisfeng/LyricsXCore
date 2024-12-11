@@ -111,8 +111,7 @@ public struct LyricsView: View {
                         }
                         .onReceive(timer) { _ in
                             position = progressing.playbackState.time
-
-                            print("position: \(position)")
+//                            print("position: \(position)")
                         }
 
                         VStack {

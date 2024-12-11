@@ -12,15 +12,17 @@ import SwiftUI
 public struct KaraokeLyricsView: View {
     private let lyricsLine: LyricsLine
     @Binding private var playingPosition: TimeInterval
-
+    
     @State private var progress: Double = 0
+    @State private var lastPosition: TimeInterval = 0
+    @State private var lastMatchIndex: Int = 0
 
     /// The total duration of the lyrics line animation, calculated from the last time tag
-    private var timeTagDuration: TimeInterval {
-        guard let lastTag = lyricsLine.attachments.timetag?.tags.last else { return 0 }
-        return lastTag.time
-    }
-
+    private let timeTagDuration: TimeInterval
+    private let timeTags: [LyricsLine.Attachments.InlineTimeTag.Tag]
+    private let finalTagIndex: Int
+    private let minUpdateInterval: TimeInterval = 0.1 // 100ms
+    
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
@@ -31,26 +33,32 @@ public struct KaraokeLyricsView: View {
     ) {
         self.lyricsLine = lyricsLine
         self._playingPosition = playingPosition
+        
+        timeTags = lyricsLine.attachments.timetag?.tags ?? []
+        timeTagDuration = timeTags.last?.time ?? 0
+        finalTagIndex = timeTags.last?.index ?? lyricsLine.content.count
     }
 
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
-        guard let timeTags = lyricsLine.attachments.timetag?.tags,
-            !timeTags.isEmpty,
-            timeTagDuration > 0
+        guard !timeTags.isEmpty, timeTagDuration > 0
         else { return }
 
+        let positionDiff = abs(position - lastPosition)
+        guard positionDiff >= minUpdateInterval else { return }
+        lastPosition = position
+        
         let newProgress = calculateProgress(at: position, with: timeTags)
-        print("updateProgress newProgress: \(newProgress)")
+        
+        let shouldAnimate =
+            !(progress == 1 && newProgress == 0)
+            && !(newProgress < progress)
+            && !(newProgress - progress > 0.1)
 
         // Don't animate when:
         // 1. Progress is resetting from 1 to 0 (line finished)
         // 2. Progress is jumping backwards (seeking)
         // 3. Progress is jumping forwards significantly (seeking)
-        let shouldAnimate =
-            !(progress == 1 && newProgress == 0)  // Not resetting
-            && !(newProgress < progress)  // Not seeking backwards
-            && !(newProgress - progress > 0.1)  // Not seeking forwards significantly
 
         if shouldAnimate {
             withAnimation(.linear(duration: 0.1)) {
@@ -72,7 +80,7 @@ public struct KaraokeLyricsView: View {
     ) -> Double {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
-
+        
         // If the position is before the line start, return 0
         if relativePosition < 0 {
             return 0
@@ -85,24 +93,26 @@ public struct KaraokeLyricsView: View {
 
         if timeTags.isEmpty { return 0 }
 
-        // The final character index, used for progress normalization
-        let finalTagIndex = timeTags.last?.index ?? lyricsLine.content.count
-
-        // Find the time tag pair that surrounds the current position
-        var lastMatchIndex = 0
-        for (index, tag) in timeTags.enumerated() {
-            if tag.time > relativePosition {
-                break
+        var currentIndex = min(lastMatchIndex, timeTags.count - 1)
+        
+        if timeTags[currentIndex].time > relativePosition {
+            while currentIndex > 0 && timeTags[currentIndex].time > relativePosition {
+                currentIndex -= 1
             }
-            lastMatchIndex = index
+        } else {
+            while currentIndex < timeTags.count - 1 && timeTags[currentIndex + 1].time <= relativePosition {
+                currentIndex += 1
+            }
         }
-
-        let previousTag = timeTags[lastMatchIndex]
+        
+        lastMatchIndex = currentIndex
+        
+        let previousTag = timeTags[currentIndex]
         let previousTagTime = previousTag.time
         let previousTagIndex = previousTag.index
-
+        
         // Handle the case when we're at or after the final tag
-        if lastMatchIndex == timeTags.count - 1 {
+        if currentIndex == timeTags.count - 1 {
             // If we've passed the final tag time, show full progress
             // Otherwise, show progress up to the final tag's index
             return relativePosition >= previousTagTime
@@ -110,10 +120,10 @@ public struct KaraokeLyricsView: View {
         }
 
         // Get the next tag for interpolation
-        let nextTag = timeTags[lastMatchIndex + 1]
+        let nextTag = timeTags[currentIndex + 1]
         let nextTagTime = nextTag.time
         let nextTagIndex = nextTag.index
-
+        
         // Calculate progress by interpolating between the two tags:
         // 1. Calculate how far we are between the two tags (0...1)
         let segmentProgress = (relativePosition - previousTagTime) / (nextTagTime - previousTagTime)
@@ -149,11 +159,11 @@ public struct KaraokeLyricsView: View {
             )
             .opacity((progress > 0 && progress <= 1) ? 1 : 0.6)
             .onChange(of: playingPosition) { newValue in
-                print("onChange playingPosition: \(newValue)")
+//                print("onChange playingPosition: \(newValue)")
                 updateProgress(position: newValue)
             }
             .onAppear {
-                print("onAppear playingPosition: \(playingPosition)")
+//                print("onAppear playingPosition: \(playingPosition)")
                 updateProgress(position: playingPosition)
             }
     }

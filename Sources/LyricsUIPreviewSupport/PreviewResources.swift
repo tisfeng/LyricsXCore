@@ -50,10 +50,17 @@ public extension PreviewResources {
 }
 
 //private let str = """
+//[00:00.546]Everybody knows it everybody's waiting
+//[00:00.546][tt]<0,0><568,10><1093,16><1668,19><2825,31><3701,38><3701>
+//"""
+
+//private let str = """
 //[00:00.000]Fools - Anna F.
 //[00:00.000][tt]<0,0><77,5><154,6><231,7><308,8><385,12><462,13><539,15><540>
 //[00:00.546]Everybody knows it everybody's waiting
 //[00:00.546][tt]<0,0><568,10><1093,16><1668,19><2825,31><3701,38><3701>
+//[00:04.664]In the end it's all gone
+//[00:04.664][tt]<0,0><223,3><431,7><918,11><1133,16><2615,20><3217,24><3217>
 //"""
 
 private let str = """
