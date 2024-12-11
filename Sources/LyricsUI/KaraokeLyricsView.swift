@@ -16,11 +16,6 @@ public struct KaraokeLyricsView: View {
     @State private var progress: Double = 0
     @State private var lastMatchIndex: Int = 0
 
-    /// The total duration of the lyrics line animation, calculated from the last time tag
-    private let timeTagDuration: TimeInterval
-    private let timeTags: [LyricsLine.Attachments.InlineTimeTag.Tag]
-    private let finalTagIndex: Int
-
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
@@ -31,15 +26,12 @@ public struct KaraokeLyricsView: View {
     ) {
         self.lyricsLine = lyricsLine
         self._playingPosition = playingPosition
-        
-        timeTags = lyricsLine.attachments.timetag?.tags ?? []
-        timeTagDuration = timeTags.last?.time ?? 0
-        finalTagIndex = timeTags.last?.index ?? lyricsLine.content.count
     }
 
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
-        progress = calculateProgress(at: position, with: timeTags)
+        // Calculate the progress based on the current position
+        progress = calculateProgress(at: position, with: lyricsLine.timeTags)
     }
 
     /// Calculates the progress value for the current position in range 0...1
@@ -89,7 +81,7 @@ public struct KaraokeLyricsView: View {
             // If we've passed the final tag time, show full progress
             // Otherwise, show progress up to the final tag's index
             return relativePosition >= previousTagTime
-                ? 1.0 : Double(previousTagIndex) / Double(finalTagIndex)
+            ? 1.0 : Double(previousTagIndex) / Double(lyricsLine.lastTagIndex)
         }
 
         // Get the next tag for interpolation
@@ -106,7 +98,7 @@ public struct KaraokeLyricsView: View {
             Double(previousTagIndex) + segmentProgress * Double(nextTagIndex - previousTagIndex)
 
         // 3. Normalize to 0...1 range using the final character index
-        return interpolationIndex / Double(finalTagIndex)
+        return interpolationIndex / Double(lyricsLine.lastTagIndex)
     }
 
     /// Creates the base text view with common styling
