@@ -40,11 +40,14 @@ public extension PreviewResources {
     static var coreState: LyricsXCoreState {
         let playbackState = PlaybackState.playing(time: 0)
         let player = MusicPlayerState(player: MusicPlayers.Virtual(track: track, state: playbackState))
+
         var searching = LyricsSearchingState(track: track)
         searching.currentLyrics = lyrics
         searching.searchResultSorted = [lyrics]
         searching.searchTerm = .info(title: track.title!, artist: track.artist!)
+
         let progressing = LyricsProgressingState(lyrics: lyrics, playbackState: playbackState)
+
         return LyricsXCoreState(playerState: player, searchingState: searching, progressingState: progressing)
     }
 }

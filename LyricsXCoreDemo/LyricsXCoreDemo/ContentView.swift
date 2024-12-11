@@ -13,9 +13,10 @@ import LyricsUI
 import MusicPlayer
 
 struct ContentView: View {
-@State private var isAutoScrollEnabled = true
+    @State private var isAutoScrollEnabled = true
+    @State private var isPlaying = true
 
-   private let store = Store(
+    private let store = Store(
         initialState: PreviewResources.coreState,
         reducer: Reducer(LyricsProgressingState.reduce)
             .optional()
@@ -30,35 +31,66 @@ struct ContentView: View {
     }
 
     var body: some View {
-
-        // Start progressing from current line
-        viewStore.send(.progressingAction(.recalculateCurrentLineIndex))
-
-        return LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
-            seekTo(position: position)
-            print("Tap position: \(position)")
+        VStack {
+            LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
+                seekTo(position: position, isPlaying: isPlaying)
+                print("Tap position: \(position)")
+            }
+            .environmentObject(viewStore)
+            .padding(.horizontal)
+            .onAppear {
+                seekTo(position: 0, isPlaying: true)
+            }
+            Spacer()
         }
-        .environmentObject(viewStore)
-        .padding(.horizontal)
+        .overlay(
+            HStack {
+                Spacer()
+                VStack {
+                    Button(action: {
+                        withAnimation {
+                            isAutoScrollEnabled.toggle()
+                        }
+                    }) {
+                        Image(
+                            systemName: isAutoScrollEnabled
+                            ? "lock.fill" : "lock.open.fill"
+                        )
+                        .font(.title3)
+                        .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
+                    }
+                    .buttonStyle(.plain)
+
+                    Button(action: {
+                        withAnimation {
+                            isPlaying.toggle()
+
+                            let position = viewStore.progressingState?.playbackState.time ?? 0
+                            seekTo(position: position, isPlaying: isPlaying)
+                        }
+                    }) {
+                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                            .font(.title3)
+                            .foregroundColor(isPlaying ? .blue : .gray)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top)
+                }
+            }
+            .padding()
+            , alignment: .topTrailing
+        )
     }
 
     /// Seek to position.
-    public func seekTo(position: TimeInterval) {
+    public func seekTo(position: TimeInterval, isPlaying: Bool) {
         if let progressing = viewStore.progressingState {
             if progressing.lyrics.lineIndex(at: position) != nil {
-                let playbackState = playbackState(at: position)
-                let action = LyricsProgressingAction.playbackStateUpdated(playbackState)
-                viewStore.send(.progressingAction(action))
+                let playbackState: PlaybackState = isPlaying ? .playing(time: position) : .paused(time: position)
+                let progressingAction = LyricsProgressingAction.playbackStateUpdated(playbackState)
+                viewStore.send(.progressingAction(progressingAction))
             }
         }
-    }
-
-    /// Play back state at position.
-    public func playbackState(at position: TimeInterval) -> MusicPlayer.PlaybackState {
-        if let isPlaying = viewStore.progressingState?.playbackState.isPlaying {
-            return isPlaying ? .playing(time: position) : .paused(time: position)
-        }
-        return .paused(time: position)
     }
 }
 

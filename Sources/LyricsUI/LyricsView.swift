@@ -11,7 +11,6 @@ import ComposableArchitecture
 import LyricsCore
 import LyricsUIPreviewSupport
 import LyricsXCore
-import MusicPlayer
 import SwiftUI
 
 let lyricsFont = Font.title2.weight(.medium)
@@ -26,21 +25,17 @@ public struct LyricsView: View {
     public var isAutoScrollEnabled: Bool
     public var showTranslation: Bool
     public let onLyricsTap: ((TimeInterval) -> Void)?
-    private let showLockButton: Bool
 
-    @State var isPlaying = true
-    @State var position = 0.0
+    @State private var playingPosition = 0.0
 
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
 
     public init(
         isAutoScrollEnabled: Binding<Bool>,
-        showLockButton: Bool = true,
         showTranslation: Bool = true,
         onLyricsTap: ((TimeInterval) -> Void)? = nil
     ) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
-        self.showLockButton = showLockButton
         self.showTranslation = showTranslation
         self.onLyricsTap = onLyricsTap
     }
@@ -52,104 +47,64 @@ public struct LyricsView: View {
 
             GeometryReader { geometry in
                 ScrollViewReader { scrollProxy in
-                    ZStack(alignment: .topTrailing) {
-                        List {
-                            halfHeightSpacer(geometry)
+                    List {
+                        halfHeightSpacer(geometry)
 
-                            ForEach(lyricsLines.indices, id: \.self) { index in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    let line = lyricsLine(at: index)!
-                                    KaraokeLyricsView(lyricsLine: line, playingPosition: $position)
+                        ForEach(lyricsLines.indices, id: \.self) { index in
+                            VStack(alignment: .leading, spacing: 6) {
+                                let line = lyricsLine(at: index)!
+                                KaraokeLyricsView(lyricsLine: line, playingPosition: $playingPosition)
 
-                                    if showTranslation,
-                                       let trans = line.attachments.translation() {
-                                        Text(trans)
-                                            .font(lyricsFont)
-                                            .fixedSize(horizontal: true, vertical: false)
-                                            .opacity(currentLineIndex == index ? 1 : 0.6)
-                                    }
-                                }
-                                .scaleEffect(
-                                    currentLineIndex == index ? 1 : 0.9,
-                                    anchor: .topLeading
-                                )
-                                .padding(.vertical, currentLineIndex == index ? 10 : 0)
-                                .animation(.default, value: currentLineIndex == index)
-                                .onTapGesture {
-                                    scrollToIndex(index, proxy: scrollProxy)
-
-                                    if let position = position(at: index) {
-                                        onLyricsTap?(position)
-                                    }
-
-                                    isPlaying = progressing.playbackState.isPlaying
+                                if showTranslation,
+                                   let trans = line.attachments.translation() {
+                                    Text(trans)
+                                        .font(lyricsFont)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                        .opacity(currentLineIndex == index ? 1 : 0.6)
                                 }
                             }
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-
-                            halfHeightSpacer(geometry)
-                        }
-                        .listStyle(PlainListStyle())
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
-                        .scrollIndicators(.hidden)
-                        .onChange(of: currentLineIndex) { index in
-                            if let index, isAutoScrollEnabled {
+                            .scaleEffect(
+                                currentLineIndex == index ? 1 : 0.9,
+                                anchor: .topLeading
+                            )
+                            .padding(.vertical, currentLineIndex == index ? 10 : 0)
+                            .animation(.default, value: currentLineIndex == index)
+                            .onTapGesture {
                                 scrollToIndex(index, proxy: scrollProxy)
-                            }
-                        }
-                        .onChange(of: isAutoScrollEnabled) { enabled in
-                            if enabled, let index = currentLineIndex {
-                                scrollToIndex(index, proxy: scrollProxy)
-                            }
-                        }
-                        .onChange(of: showTranslation) { _ in
-                            if let index = currentLineIndex {
-                                scrollToIndex(index, proxy: scrollProxy)
-                            }
-                        }
-                        .onReceive(timer) { _ in
-                            let playingPostion = progressing.playbackState.time
-                            if playingPostion <= progressing.lyrics.maxPosition {
-                                position = playingPostion
-                            }
-                        }
 
-                        VStack {
-                            if showLockButton {
-                                Button(action: {
-                                    withAnimation {
-                                        isAutoScrollEnabled.toggle()
-                                    }
-                                }) {
-                                    Image(
-                                        systemName: isAutoScrollEnabled
-                                        ? "lock.fill" : "lock.open.fill"
-                                    )
-                                    .font(.title3)
-                                    .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
+                                if let position = position(at: index) {
+                                    onLyricsTap?(position)
                                 }
-                                .buttonStyle(.plain)
-                                .padding(.top)
                             }
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
 
-                            Button(action: {
-                                withAnimation {
-                                    isPlaying.toggle()
-
-                                    let position = progressing.playbackState.time
-                                    coreStore.send(.progressingAction(.playbackStateUpdated(
-                                        isPlaying ? .playing(time: position) : .paused(time: position)
-                                    )))
-                                }
-                            }) {
-                                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.title3)
-                                    .foregroundColor(isPlaying ? .blue : .gray)
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.top)
+                        halfHeightSpacer(geometry)
+                    }
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .scrollIndicators(.hidden)
+                    .onChange(of: currentLineIndex) { index in
+                        if let index, isAutoScrollEnabled {
+                            scrollToIndex(index, proxy: scrollProxy)
+                        }
+                    }
+                    .onChange(of: isAutoScrollEnabled) { enabled in
+                        if enabled, let index = currentLineIndex {
+                            scrollToIndex(index, proxy: scrollProxy)
+                        }
+                    }
+                    .onChange(of: showTranslation) { _ in
+                        if let index = currentLineIndex {
+                            scrollToIndex(index, proxy: scrollProxy)
+                        }
+                    }
+                    .onReceive(timer) { _ in
+                        let playingPostion = progressing.playbackState.time
+                        if playingPostion <= progressing.lyrics.maxPosition {
+                            playingPosition = playingPostion
                         }
                     }
                 }
@@ -191,6 +146,8 @@ public struct LyricsView: View {
         return nil
     }
 }
+
+// MARK: - Preview
 
 @available(macOS 13.0, *)
 struct LyricsView_Previews: PreviewProvider {
