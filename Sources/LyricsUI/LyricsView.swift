@@ -110,8 +110,10 @@ public struct LyricsView: View {
                             }
                         }
                         .onReceive(timer) { _ in
-                            position = progressing.playbackState.time
-//                            print("position: \(position)")
+                            let playingPostion = progressing.playbackState.time
+                            if playingPostion <= progressing.lyrics.maxPosition {
+                                position = playingPostion
+                            }
                         }
 
                         VStack {

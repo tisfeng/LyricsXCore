@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  LyricsLine+Extension.swift
 //  LyricsXCore
 //
 //  Created by tisfeng on 2024/12/11.
@@ -8,7 +8,7 @@
 import Foundation
 import LyricsCore
 
-extension LyricsLine {
+public extension LyricsLine {
     var timeTags: [Attachments.InlineTimeTag.Tag] {
         attachments.timetag?.tags ?? []
     }
@@ -21,7 +21,21 @@ extension LyricsLine {
         timeTags.last?.index ?? content.count
     }
 
+    var lastLine: LyricsLine? {
+        lyrics?.lastLine
+    }
+
     var maxPosition: TimeInterval {
         position + timeTagDuration
+    }
+}
+
+public extension Lyrics {
+    var lastLine: LyricsLine? {
+        lines.last
+    }
+
+    var maxPosition: TimeInterval {
+        lastLine?.maxPosition ?? 0
     }
 }
