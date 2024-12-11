@@ -59,7 +59,7 @@ public struct LyricsView: View {
                             ForEach(lyricsLines.indices, id: \.self) { index in
                                 VStack(alignment: .leading, spacing: 6) {
                                     let line = lyricsLine(at: index)!
-                                    KaraokeLyricsView(lyricsLine: line, playingPosition: position)
+                                    KaraokeLyricsView(lyricsLine: line, playingPosition: $position)
 
                                     if showTranslation,
                                        let trans = line.attachments.translation() {
@@ -111,6 +111,8 @@ public struct LyricsView: View {
                         }
                         .onReceive(timer) { _ in
                             position = progressing.playbackState.time
+
+                            print("position: \(position)")
                         }
 
                         VStack {
