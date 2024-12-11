@@ -14,15 +14,13 @@ public struct KaraokeLyricsView: View {
     @Binding private var playingPosition: TimeInterval
     
     @State private var progress: Double = 0
-    @State private var lastPosition: TimeInterval = 0
     @State private var lastMatchIndex: Int = 0
 
     /// The total duration of the lyrics line animation, calculated from the last time tag
     private let timeTagDuration: TimeInterval
     private let timeTags: [LyricsLine.Attachments.InlineTimeTag.Tag]
     private let finalTagIndex: Int
-    private let minUpdateInterval: TimeInterval = 0.1 // 100ms
-    
+
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
@@ -41,32 +39,7 @@ public struct KaraokeLyricsView: View {
 
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
-        guard !timeTags.isEmpty, timeTagDuration > 0
-        else { return }
-
-        let positionDiff = abs(position - lastPosition)
-        guard positionDiff >= minUpdateInterval else { return }
-        lastPosition = position
-        
-        let newProgress = calculateProgress(at: position, with: timeTags)
-        
-        let shouldAnimate =
-            !(progress == 1 && newProgress == 0)
-            && !(newProgress < progress)
-            && !(newProgress - progress > 0.1)
-
-        // Don't animate when:
-        // 1. Progress is resetting from 1 to 0 (line finished)
-        // 2. Progress is jumping backwards (seeking)
-        // 3. Progress is jumping forwards significantly (seeking)
-
-        if shouldAnimate {
-            withAnimation(.linear(duration: 0.1)) {
-                progress = newProgress
-            }
-        } else {
-            progress = newProgress
-        }
+        progress = calculateProgress(at: position, with: timeTags)
     }
 
     /// Calculates the progress value for the current position in range 0...1
