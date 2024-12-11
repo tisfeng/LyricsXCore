@@ -32,9 +32,13 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { position in
+            LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { index, proxy  in
+                let position = viewStore.progressingState?.lyrics.lines[index].position ?? 0
                 seekTo(position: position, isPlaying: isPlaying)
-                print("Tap position: \(position)")
+
+                withAnimation(.easeInOut) {
+                    proxy.scrollTo(index, anchor: .center)
+                }
             }
             .environmentObject(viewStore)
             .padding(.horizontal)
@@ -84,13 +88,9 @@ struct ContentView: View {
 
     /// Seek to position.
     public func seekTo(position: TimeInterval, isPlaying: Bool) {
-        if let progressing = viewStore.progressingState {
-            if progressing.lyrics.lineIndex(at: position) != nil {
-                let playbackState: PlaybackState = isPlaying ? .playing(time: position) : .paused(time: position)
-                let progressingAction = LyricsProgressingAction.playbackStateUpdated(playbackState)
-                viewStore.send(.progressingAction(progressingAction))
-            }
-        }
+        let playbackState: PlaybackState = isPlaying ? .playing(time: position) : .paused(time: position)
+        let progressingAction = LyricsProgressingAction.playbackStateUpdated(playbackState)
+        viewStore.send(.progressingAction(progressingAction))
     }
 }
 

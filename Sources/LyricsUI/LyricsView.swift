@@ -18,22 +18,19 @@ let lyricsFont = Font.title2.weight(.medium)
 @available(macOS 13.0, *)
 public struct LyricsView: View {
 
-    @EnvironmentObject
-    public var coreStore: ViewStore<LyricsXCoreState, LyricsXCoreAction>
+    @EnvironmentObject public var coreStore: ViewStore<LyricsXCoreState, LyricsXCoreAction>
 
-    @Binding
-    public var isAutoScrollEnabled: Bool
+    @Binding public var isAutoScrollEnabled: Bool
     public var showTranslation: Bool
-    public let onLyricsTap: ((TimeInterval) -> Void)?
-
-    @State private var playingPosition = 0.0
+    public let onLyricsTap: ((Int, ScrollViewProxy) -> Void)?
 
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+    @State private var playingPosition = 0.0
 
     public init(
         isAutoScrollEnabled: Binding<Bool>,
         showTranslation: Bool = true,
-        onLyricsTap: ((TimeInterval) -> Void)? = nil
+        onLyricsTap: ((Int, ScrollViewProxy) -> Void)? = nil
     ) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
         self.showTranslation = showTranslation
@@ -70,11 +67,7 @@ public struct LyricsView: View {
                             .padding(.vertical, currentLineIndex == index ? 10 : 0)
                             .animation(.default, value: currentLineIndex == index)
                             .onTapGesture {
-                                scrollToIndex(index, proxy: scrollProxy)
-
-                                if let position = position(at: index) {
-                                    onLyricsTap?(position)
-                                }
+                                onLyricsTap?(index, scrollProxy)
                             }
                         }
                         .listRowBackground(Color.clear)
