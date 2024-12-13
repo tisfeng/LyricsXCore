@@ -13,7 +13,8 @@ import LyricsUIPreviewSupport
 import LyricsXCore
 import SwiftUI
 
-let lyricsFont = Font.title2.weight(.medium)
+let lyricsTextFont = Font.title2.weight(.medium)
+let lyricsTextHighlightColor = Color.green
 
 @available(macOS 13.0, *)
 public struct LyricsView: View {
@@ -50,12 +51,12 @@ public struct LyricsView: View {
                         ForEach(lyricsLines.indices, id: \.self) { index in
                             VStack(alignment: .leading, spacing: 6) {
                                 let line = lyricsLine(at: index)!
-                                KaraokeLyricsView(lyricsLine: line, playingPosition: $playingPosition)
+                                KaraokeLyricsView(lyricsLine: line, elapsedTime: $playingPosition)
 
                                 if showTranslation,
                                    let trans = line.attachments.translation() {
                                     Text(trans)
-                                        .font(lyricsFont)
+                                        .font(lyricsTextFont)
                                         .fixedSize(horizontal: true, vertical: false)
                                         .opacity(currentLineIndex == index ? 1 : 0.6)
                                 }
