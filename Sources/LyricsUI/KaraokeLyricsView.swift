@@ -43,13 +43,11 @@ public struct KaraokeLyricsView: View {
                         .clipped()
                 }
             )
-            .opacity((progress > 0 || isPlayingLine) ? 1 : 0.6)
+            .opacity((progress > 0) ? 1 : 0.6)
             .onChange(of: elapsedTime) { newValue in
-                updateIsPlayingLine()
                 updateProgress(position: newValue)
             }
             .onAppear {
-                updateIsPlayingLine()
                 updateProgress(position: elapsedTime)
             }
     }
@@ -58,12 +56,13 @@ public struct KaraokeLyricsView: View {
     private var lyricstText: some View {
         Text(lyricsLine.content)
             .font(lyricsTextFont)
-            .foregroundColor(isPlayingLine ? lyricsTextHighlightColor : .primary)
             .fixedSize(horizontal: true, vertical: false)
     }
 
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
+        print("updateProgress: \(position)")
+
         // If has beyond the last tag, return
         if let lastLine = lyricsLine.lastLine, elapsedTime >= lastLine.maxPosition {
             return
@@ -71,6 +70,8 @@ public struct KaraokeLyricsView: View {
 
         // Calculate the progress based on the current position
         progress = calculateProgress(at: position, with: lyricsLine.timeTags)
+
+        print("progress: \(progress), position: \(position)")
     }
 
     /// Calculates the progress value for the current position in range 0...1
@@ -85,16 +86,21 @@ public struct KaraokeLyricsView: View {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
 
-        // If lyrics line has no time tags, return 0
-        if timeTags.isEmpty {
-            return 0
-        }
+        updateIsPlayingLine()
 
         // If lyrics line is not playing, return 0
         if !isPlayingLine {
             return 0
         }
 
+        // If the playing line has no time tags, return 1
+        if timeTags.isEmpty {
+            return 1.0
+        }
+
+        // Calculate the progress based on the time tags
+
+        // Find the current time tag index
         var currentIndex = min(lastMatchIndex, timeTags.count - 1)
 
         if timeTags[currentIndex].time > relativePosition {
@@ -163,8 +169,7 @@ public struct KaraokeLyricsView: View {
 
 extension LyricsLine {
     static func previewLine() -> LyricsLine {
-        let position = 29.874
-        var line = LyricsLine(content: "一幽风飞散发披肩", position: position)
+        var line = LyricsLine.previewLineWithoutTags()
         let timeTagStr =
             "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
         line.attachments.timetag = .init(timeTagStr)
@@ -173,7 +178,7 @@ extension LyricsLine {
 
     /// preview line without time tags
     static func previewLineWithoutTags() -> LyricsLine {
-        LyricsLine(content: "一幽风飞散发披肩", position: 0)
+        LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
     }
 }
 
@@ -224,4 +229,10 @@ struct KaraokeLyricsPreview: View {
 #Preview("Animation") {
     let line = LyricsLine.previewLine()
     return KaraokeLyricsPreview(lyricsLine: line, startPosition: line.position)
+}
+
+#Preview("No Time Tags") {
+    let line = LyricsLine.previewLineWithoutTags()
+    return KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position))
+        .padding()
 }

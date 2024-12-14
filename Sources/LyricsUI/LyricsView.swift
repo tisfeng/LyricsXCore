@@ -16,6 +16,8 @@ import SwiftUI
 let lyricsTextFont = Font.title2.weight(.medium)
 let lyricsTextHighlightColor = Color.green
 
+let updateTimerInterval = 0.1
+
 @available(macOS 13.0, *)
 public struct LyricsView: View {
 
@@ -25,7 +27,7 @@ public struct LyricsView: View {
     public var showTranslation: Bool
     public let onLyricsTap: ((Int, ScrollViewProxy) -> Void)?
 
-    private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: updateTimerInterval, on: .main, in: .common).autoconnect()
     @State private var elapsedTime = 0.0
 
     public init(
@@ -97,7 +99,7 @@ public struct LyricsView: View {
                     }
                     .onReceive(timer) { _ in
                         let time = progressing.playbackState.time
-                        let maxPosition = progressing.lyrics.maxPosition
+                        let maxPosition = progressing.lyrics.maxPosition + 1
                         if time <= maxPosition {
                             elapsedTime = time
                         }
