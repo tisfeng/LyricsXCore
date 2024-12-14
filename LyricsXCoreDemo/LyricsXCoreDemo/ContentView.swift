@@ -14,7 +14,7 @@ import MusicPlayer
 
 struct ContentView: View {
     @State private var isAutoScrollEnabled = true
-    @State private var isPlaying = true
+    @State private var isPlaying = false
 
     private let store = Store(
         initialState: PreviewResources.coreState,
@@ -57,8 +57,7 @@ struct ContentView: View {
                         }
                     }) {
                         Image(
-                            systemName: isAutoScrollEnabled
-                            ? "lock.fill" : "lock.open.fill"
+                            systemName: isAutoScrollEnabled ? "lock.fill" : "lock.open.fill"
                         )
                         .font(.title3)
                         .foregroundColor(isAutoScrollEnabled ? .blue : .gray)
@@ -88,9 +87,10 @@ struct ContentView: View {
 
     /// Seek to position.
     public func seekTo(position: TimeInterval, isPlaying: Bool) {
+        self.isPlaying = isPlaying
         let playbackState: PlaybackState = isPlaying ? .playing(time: position) : .paused(time: position)
-        let progressingAction = LyricsProgressingAction.playbackStateUpdated(playbackState)
-        viewStore.send(.progressingAction(progressingAction))
+        let updatedPlaybackState = LyricsProgressingAction.playbackStateUpdated(playbackState)
+        viewStore.send(.progressingAction(updatedPlaybackState))
     }
 }
 
