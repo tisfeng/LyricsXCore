@@ -15,6 +15,7 @@ public struct KaraokeLyricsView: View {
 
     @State private var progress: Double = 0
     @State private var lastMatchIndex: Int = 0
+    @State private var isPlayingLine: Bool = false
 
     /// Creates a new karaoke lyrics view
     /// - Parameters:
@@ -62,7 +63,7 @@ public struct KaraokeLyricsView: View {
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
         // If has beyond the last tag, return
-        if let lastLine = lyricsLine.lastLine, position >= lastLine.maxPosition {
+        if let lastLine = lyricsLine.lastLine, elapsedTime >= lastLine.maxPosition {
             return
         }
 
@@ -81,6 +82,8 @@ public struct KaraokeLyricsView: View {
     ) -> Double {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
+
+        updateIsPlayingLine()
 
         // If lyrics line is not playing, return 0
         if !isPlayingLine {
@@ -135,8 +138,8 @@ public struct KaraokeLyricsView: View {
         return interpolationIndex / Double(lyricsLine.lastTagIndex)
     }
 
-    private var isPlayingLine: Bool {
-        isPlaying(line: lyricsLine, elapsedTime: elapsedTime)
+    private func updateIsPlayingLine() {
+        isPlayingLine = isPlaying(line: lyricsLine, elapsedTime: elapsedTime)
     }
 
     /// Check if the lyrics line is playing

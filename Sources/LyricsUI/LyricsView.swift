@@ -26,7 +26,7 @@ public struct LyricsView: View {
     public let onLyricsTap: ((Int, ScrollViewProxy) -> Void)?
 
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
-    @State private var playingPosition = 0.0
+    @State private var elapsedTime = 0.0
 
     public init(
         isAutoScrollEnabled: Binding<Bool>,
@@ -51,7 +51,7 @@ public struct LyricsView: View {
                         ForEach(lyricsLines.indices, id: \.self) { index in
                             VStack(alignment: .leading, spacing: 6) {
                                 let line = lyricsLine(at: index)!
-                                KaraokeLyricsView(lyricsLine: line, elapsedTime: $playingPosition)
+                                KaraokeLyricsView(lyricsLine: line, elapsedTime: $elapsedTime)
 
                                 if showTranslation,
                                    let trans = line.attachments.translation() {
@@ -96,9 +96,10 @@ public struct LyricsView: View {
                         }
                     }
                     .onReceive(timer) { _ in
-                        let playingPostion = progressing.playbackState.time
-                        if playingPostion <= progressing.lyrics.maxPosition {
-                            playingPosition = playingPostion
+                        let time = progressing.playbackState.time
+                        let maxPosition = progressing.lyrics.maxPosition
+                        if time <= maxPosition {
+                            elapsedTime = time
                         }
                     }
                 }

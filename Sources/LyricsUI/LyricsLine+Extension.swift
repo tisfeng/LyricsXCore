@@ -8,6 +8,9 @@
 import Foundation
 import LyricsCore
 
+/// The maximum duration of a line when no time tag is found
+let lineMaxDuration = 10.0
+
 public extension LyricsLine {
     var timeTags: [Attachments.InlineTimeTag.Tag] {
         attachments.timetag?.tags ?? []
@@ -26,7 +29,8 @@ public extension LyricsLine {
     }
 
     var maxPosition: TimeInterval {
-        position + timeTagDuration
+        let duration = timeTagDuration > 0 ? timeTagDuration : lineMaxDuration
+        return position + duration
     }
 }
 
