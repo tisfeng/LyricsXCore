@@ -99,7 +99,7 @@ public struct LyricsView: View {
                     }
                     .onReceive(timer) { _ in
                         let time = progressing.playbackState.time
-                        let maxPosition = progressing.lyrics.maxPosition + 1
+                        let maxPosition = progressing.lyrics.maxPosition + updateTimerInterval
                         if time <= maxPosition {
                             elapsedTime = time
                         }

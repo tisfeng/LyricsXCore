@@ -61,17 +61,13 @@ public struct KaraokeLyricsView: View {
 
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
-        print("updateProgress: \(position)")
-
         // If has beyond the last tag, return
-        if let lastLine = lyricsLine.lastLine, elapsedTime >= lastLine.maxPosition {
+        if let lastLine = lyricsLine.lastLine, position >= lastLine.maxPosition + updateTimerInterval {
             return
         }
 
         // Calculate the progress based on the current position
         progress = calculateProgress(at: position, with: lyricsLine.timeTags)
-
-        print("progress: \(progress), position: \(position)")
     }
 
     /// Calculates the progress value for the current position in range 0...1
