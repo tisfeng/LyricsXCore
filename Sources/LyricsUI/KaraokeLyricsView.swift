@@ -45,9 +45,11 @@ public struct KaraokeLyricsView: View {
             )
             .opacity((progress > 0 || isPlayingLine) ? 1 : 0.6)
             .onChange(of: elapsedTime) { newValue in
+                updateIsPlayingLine()
                 updateProgress(position: newValue)
             }
             .onAppear {
+                updateIsPlayingLine()
                 updateProgress(position: elapsedTime)
             }
     }
@@ -83,15 +85,13 @@ public struct KaraokeLyricsView: View {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
 
-        updateIsPlayingLine()
-
-        // If lyrics line is not playing, return 0
-        if !isPlayingLine {
+        // If lyrics line has no time tags, return 0
+        if timeTags.isEmpty {
             return 0
         }
 
-        // If lyrics line has no time tags, return 0
-        if timeTags.isEmpty {
+        // If lyrics line is not playing, return 0
+        if !isPlayingLine {
             return 0
         }
 
