@@ -82,7 +82,7 @@ public struct KaraokeLyricsView: View {
         // Convert position to relative time within the line
         let relativePosition = position - lyricsLine.position
 
-        updateIsPlayingLine()
+        isPlayingLine = isPlaying(line: lyricsLine, elapsedTime: position)
 
         // If lyrics line is not playing, return 0
         if !isPlayingLine {
@@ -138,10 +138,6 @@ public struct KaraokeLyricsView: View {
 
         // 3. Normalize to 0...1 range using the final character index
         return interpolationIndex / Double(lyricsLine.lastTagIndex)
-    }
-
-    private func updateIsPlayingLine() {
-        isPlayingLine = isPlaying(line: lyricsLine, elapsedTime: elapsedTime)
     }
 
     /// Check if the lyrics line is playing
