@@ -48,7 +48,8 @@ public struct LyricsView: View {
     public var body: some View {
         if let progressing = coreStore.progressingState {
             let currentLineIndex = progressing.currentLineIndex
-            let lyricsLines = progressing.lyrics.lines
+            let lyrics = progressing.lyrics
+            let lyricsLines = lyrics.lines
 
             GeometryReader { geometry in
                 ScrollViewReader { scrollProxy in
@@ -57,8 +58,11 @@ public struct LyricsView: View {
 
                         ForEach(lyricsLines.indices, id: \.self) { index in
                             VStack(alignment: .leading, spacing: 6) {
-                                let line = lyricsLine(at: index)!
-                                KaraokeLyricsView(lyricsLine: line, elapsedTime: $elapsedTime)
+                                let line = lyricsLines[index]
+                                KaraokeLyricsView(
+                                    lyricsLine: line,
+                                    lyrics: lyrics,
+                                    elapsedTime: $elapsedTime)
 
                                 if showTranslation,
                                    let trans = line.attachments.translation() {
@@ -137,16 +141,6 @@ public struct LyricsView: View {
         withAnimation(.easeInOut) {
             proxy.scrollTo(index, anchor: .center)
         }
-    }
-
-    /// Lyrics line at index, with lyrics.
-    private func lyricsLine(at index: Int) -> LyricsLine? {
-        if let progressing = coreStore.progressingState {
-            var lyricsLine = progressing.lyrics[index]
-            lyricsLine.lyrics = progressing.lyrics
-            return lyricsLine
-        }
-        return nil
     }
 }
 

@@ -11,6 +11,10 @@ import SwiftUI
 /// A view that displays karaoke-style animated lyrics with time-synchronized highlighting
 public struct KaraokeLyricsView: View {
     private let lyricsLine: LyricsLine
+
+    // We need lyricsLine.nextLine to determine if the line is playing, and lyricsLine.lyrics is weak, so we need to keep a strong reference for it.
+    private let lyrics: Lyrics
+
     @Binding private var elapsedTime: TimeInterval
 
     @State private var progress: Double = 0
@@ -20,12 +24,15 @@ public struct KaraokeLyricsView: View {
     /// Creates a new karaoke lyrics view
     /// - Parameters:
     ///   - lyricsLine: The lyrics line to display and animate
+    ///   - lyrics: The lyrics that contains this line
     ///   - elapsedTime: The current playback position relative to the line start
     public init(
         lyricsLine: LyricsLine,
+        lyrics: Lyrics,
         elapsedTime: Binding<TimeInterval>
     ) {
         self.lyricsLine = lyricsLine
+        self.lyrics = lyrics
         self._elapsedTime = elapsedTime
     }
 
@@ -62,7 +69,9 @@ public struct KaraokeLyricsView: View {
     /// Update the progress based on current position
     private func updateProgress(position: TimeInterval) {
         // If has beyond the last tag, return
-        if let lastLine = lyricsLine.lastLine, position >= lastLine.maxPosition + updateTimerInterval {
+        if let lastLine = lyricsLine.lastLine,
+            position >= lastLine.maxPosition + updateTimerInterval
+        {
             return
         }
 
@@ -104,7 +113,9 @@ public struct KaraokeLyricsView: View {
                 currentIndex -= 1
             }
         } else {
-            while currentIndex < timeTags.count - 1 && timeTags[currentIndex + 1].time <= relativePosition {
+            while currentIndex < timeTags.count - 1
+                && timeTags[currentIndex + 1].time <= relativePosition
+            {
                 currentIndex += 1
             }
         }
@@ -120,7 +131,7 @@ public struct KaraokeLyricsView: View {
             // If we've passed the final tag time, show full progress
             // Otherwise, show progress up to the final tag's index
             return relativePosition >= previousTagTime
-            ? 1.0 : Double(previousTagIndex) / Double(lyricsLine.lastTagIndex)
+                ? 1.0 : Double(previousTagIndex) / Double(lyricsLine.lastTagIndex)
         }
 
         // Get the next tag for interpolation
@@ -159,20 +170,18 @@ public struct KaraokeLyricsView: View {
 
 // MARK: - Previews
 
-extension LyricsLine {
-    static func previewLine() -> LyricsLine {
-        var line = LyricsLine.previewLineWithoutTags()
-        let timeTagStr =
-            "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
-        line.attachments.timetag = .init(timeTagStr)
-        return line
-    }
+let previewLineWithoutTags = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
 
-    /// preview line without time tags
-    static func previewLineWithoutTags() -> LyricsLine {
-        LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
-    }
-}
+let previewLine = {
+    var line = previewLineWithoutTags
+    let timeTagStr =
+        "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
+    line.attachments.timetag = .init(timeTagStr)
+    return line
+}()
+
+let lyrics = Lyrics(lines: [previewLine], idTags: [:])
+
 
 // Preview helper view to simulate playback
 struct KaraokeLyricsPreview: View {
@@ -185,7 +194,7 @@ struct KaraokeLyricsPreview: View {
     }
 
     var body: some View {
-        KaraokeLyricsView(lyricsLine: lyricsLine, elapsedTime: $playingPosition)
+        KaraokeLyricsView(lyricsLine: lyricsLine, lyrics: lyrics, elapsedTime: $playingPosition)
             .padding()
             .onAppear {
                 Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -199,32 +208,39 @@ struct KaraokeLyricsPreview: View {
 }
 
 #Preview("Static") {
-    let line = LyricsLine.previewLine()
-    return KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position))
-        .padding()
+    let line = previewLine
+    return KaraokeLyricsView(
+        lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position)
+    )
+    .padding()
 }
 
 #Preview("Progress States") {
-    let line = LyricsLine.previewLine()
+    let line = previewLine
     return VStack(spacing: 20) {
-        KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position))
+        KaraokeLyricsView(lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position))
 
-        KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position + 1.0))
+        KaraokeLyricsView(
+            lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position + 1.0))
 
-        KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position + 3.0))
+        KaraokeLyricsView(
+            lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position + 3.0))
 
-        KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position + 7.0))
+        KaraokeLyricsView(
+            lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position + 7.0))
     }
     .padding()
 }
 
 #Preview("Animation") {
-    let line = LyricsLine.previewLine()
+    let line = previewLine
     return KaraokeLyricsPreview(lyricsLine: line, startPosition: line.position)
 }
 
 #Preview("No Time Tags") {
-    let line = LyricsLine.previewLineWithoutTags()
-    return KaraokeLyricsView(lyricsLine: line, elapsedTime: .constant(line.position))
-        .padding()
+    let line = previewLineWithoutTags
+    return KaraokeLyricsView(
+        lyricsLine: line, lyrics: lyrics, elapsedTime: .constant(line.position)
+    )
+    .padding()
 }
