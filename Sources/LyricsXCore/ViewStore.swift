@@ -47,13 +47,13 @@ public func createViewStore(
     return ViewStore(store)
 }
 
-private func createPlaybackState(elapsedTime: Double, isPlaying: Bool)
+public func createPlaybackState(elapsedTime: Double, isPlaying: Bool)
     -> MusicPlayer.PlaybackState
 {
     isPlaying ? .playing(time: elapsedTime) : .paused(time: elapsedTime)
 }
 
-private func createSearchingState(track: MusicTrack, lyrics: Lyrics) -> LyricsSearchingState {
+public func createSearchingState(track: MusicTrack, lyrics: Lyrics) -> LyricsSearchingState {
     var searching = LyricsSearchingState(track: track)
     searching.currentLyrics = lyrics
     searching.searchResultSorted = [lyrics]

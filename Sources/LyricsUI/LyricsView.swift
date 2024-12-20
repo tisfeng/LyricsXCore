@@ -12,6 +12,7 @@ import LyricsCore
 import LyricsUIPreviewSupport
 import LyricsXCore
 import SwiftUI
+import Combine
 
 let lyricsTextFont = Font.title2.weight(.medium)
 let lyricsTextHighlightColor = Color.green
@@ -27,16 +28,20 @@ public struct LyricsView: View {
     public var showTranslation: Bool
     public let onLyricsTap: ((Int, ScrollViewProxy) -> Void)?
 
-    private let timer = Timer.publish(every: updateTimerInterval, on: .main, in: .common).autoconnect()
     @State private var elapsedTime = 0.0
+
+    /// Timer for updating elapsed time
+    private let timer: Publishers.Autoconnect<Timer.TimerPublisher>
 
     public init(
         isAutoScrollEnabled: Binding<Bool>,
         showTranslation: Bool = true,
+        timer: Publishers.Autoconnect<Timer.TimerPublisher>? = nil,
         onLyricsTap: ((Int, ScrollViewProxy) -> Void)? = nil
     ) {
         self._isAutoScrollEnabled = isAutoScrollEnabled
         self.showTranslation = showTranslation
+        self.timer = timer ?? Timer.publish(every: updateTimerInterval, on: .main, in: .common).autoconnect()
         self.onLyricsTap = onLyricsTap
     }
 
@@ -100,7 +105,7 @@ public struct LyricsView: View {
                     }
                     .onReceive(timer) { _ in
                         let playingTime = progressing.playbackState.time
-                        let maxPosition = progressing.lyrics.maxPosition + updateTimerInterval
+                        let maxPosition = progressing.lyrics.maxPosition + timer.upstream.interval
                         if playingTime <= maxPosition {
                             elapsedTime = playingTime
                         }
