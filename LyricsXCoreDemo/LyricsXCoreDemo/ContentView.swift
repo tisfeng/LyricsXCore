@@ -16,19 +16,10 @@ struct ContentView: View {
     @State private var isAutoScrollEnabled = true
     @State private var isPlaying = false
 
-    private let store = Store(
-        initialState: PreviewResources.coreState,
-        reducer: Reducer(LyricsProgressingState.reduce)
-            .optional()
-            .pullback(
-                state: \LyricsXCoreState.progressingState,
-                action: /LyricsXCoreAction.progressingAction,
-                environment: { $0 }),
-        environment: .default)
-
-    private var viewStore: ViewStore<LyricsXCoreState, LyricsXCoreAction> {
-        ViewStore(store)
-    }
+    private var viewStore = createViewStore(
+        track: PreviewResources.track,
+        lyrics: PreviewResources.lyrics
+    )
 
     var body: some View {
         VStack {
