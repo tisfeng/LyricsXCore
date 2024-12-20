@@ -22,7 +22,7 @@ struct ContentView: View {
     )
 
     var body: some View {
-        VStack {
+        ZStack(alignment: .topTrailing) {
             LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { index, proxy  in
                 let position = viewStore.progressingState?.lyrics.lines[index].position ?? 0
                 seekTo(position: position, isPlaying: isPlaying)
@@ -36,9 +36,7 @@ struct ContentView: View {
             .onAppear {
                 seekTo(position: 0, isPlaying: true)
             }
-            Spacer()
-        }
-        .overlay(
+
             HStack {
                 Spacer()
                 VStack {
@@ -72,8 +70,7 @@ struct ContentView: View {
                 }
             }
             .padding()
-            , alignment: .topTrailing
-        )
+        }
     }
 
     /// Seek to position.
