@@ -63,6 +63,7 @@ public struct LyricsView: View {
                                         .opacity(currentLineIndex == index ? 1 : 0.6)
                                 }
                             }
+                            .contentShape(Rectangle())  // Make the entire VStack tappable
                             .scaleEffect(
                                 currentLineIndex == index ? 1 : 0.9,
                                 anchor: .topLeading
