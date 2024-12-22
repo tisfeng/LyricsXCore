@@ -17,7 +17,7 @@ import Combine
 let lyricsTextFont = Font.title2.weight(.medium)
 let lyricsTextHighlightColor = Color.green
 
-let updateTimerInterval = 0.1
+var updateTimerInterval = 0.1
 
 @available(macOS 13.0, *)
 public struct LyricsView: View {
@@ -42,6 +42,7 @@ public struct LyricsView: View {
         self._isAutoScrollEnabled = isAutoScrollEnabled
         self.showTranslation = showTranslation
         self.timer = timer ?? Timer.publish(every: updateTimerInterval, on: .main, in: .common).autoconnect()
+        updateTimerInterval = self.timer.upstream.interval
         self.onLyricsTap = onLyricsTap
     }
 
@@ -109,7 +110,7 @@ public struct LyricsView: View {
                     }
                     .onReceive(timer) { _ in
                         let playingTime = progressing.playbackState.time
-                        let maxPosition = progressing.lyrics.maxPosition + timer.upstream.interval
+                        let maxPosition = progressing.lyrics.maxPosition + updateTimerInterval
                         if playingTime <= maxPosition {
                             elapsedTime = playingTime
                         }

@@ -32,7 +32,7 @@ struct ContentView: View {
                 }
             }
             .environmentObject(viewStore)
-            .padding(.horizontal)
+            .padding()
             .onAppear {
                 seekTo(position: 0, isPlaying: true)
             }

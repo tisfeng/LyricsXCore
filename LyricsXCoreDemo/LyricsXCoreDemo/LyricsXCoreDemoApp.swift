@@ -13,5 +13,6 @@ struct LyricsXCoreDemoApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.hiddenTitleBar)
     }
 }
