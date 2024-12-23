@@ -24,7 +24,7 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             LyricsView(isAutoScrollEnabled: $isAutoScrollEnabled) { index, proxy  in
-                let position = viewStore.progressingState?.lyrics.lines[index].position ?? 0
+                let position = viewStore.progressingState?.lyrics[index].position ?? 0
                 seekTo(position: position, isPlaying: isPlaying)
 
                 withAnimation(.easeInOut) {
@@ -37,6 +37,7 @@ struct ContentView: View {
                 seekTo(position: 0, isPlaying: true)
             }
 
+            /// Controls for auto-scroll and play/pause, just for demo.
             HStack {
                 Spacer()
                 VStack {

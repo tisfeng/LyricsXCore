@@ -17,8 +17,8 @@ import MusicPlayer
 ///   - elapsedTime: The current playback position relative to the start of the track.
 ///   - isPlaying: Whether the track is currently playing.
 public func createViewStore(
-    track: MusicTrack,
-    lyrics: Lyrics,
+    track: MusicTrack? = nil,
+    lyrics: Lyrics? = nil,
     elapsedTime: TimeInterval = 0,
     isPlaying: Bool = false
 ) -> ViewStore<LyricsXCoreState, LyricsXCoreAction> {
@@ -26,7 +26,11 @@ public func createViewStore(
     let player = MusicPlayerState(player: MusicPlayers.Virtual(track: track, state: playbackState))
 
     let searching = createSearchingState(track: track, lyrics: lyrics)
-    let progressing = LyricsProgressingState(lyrics: lyrics, playbackState: playbackState)
+
+    var progressing: LyricsProgressingState?
+    if let lyrics {
+        progressing = .init(lyrics: lyrics, playbackState: playbackState)
+    }
 
     let coreState = LyricsXCoreState(
         playerState: player,
@@ -53,11 +57,13 @@ public func createPlaybackState(elapsedTime: Double, isPlaying: Bool)
     isPlaying ? .playing(time: elapsedTime) : .paused(time: elapsedTime)
 }
 
-public func createSearchingState(track: MusicTrack, lyrics: Lyrics) -> LyricsSearchingState {
+public func createSearchingState(track: MusicTrack?, lyrics: Lyrics?) -> LyricsSearchingState {
     var searching = LyricsSearchingState(track: track)
     searching.currentLyrics = lyrics
-    searching.searchResultSorted = [lyrics]
-    if let title = track.title, let artist = track.artist {
+    if let lyrics {
+        searching.searchResultSorted = [lyrics]
+    }
+    if let title = track?.title, let artist = track?.artist {
         searching.searchTerm = .info(title: title, artist: artist)
     }
     return searching

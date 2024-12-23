@@ -110,7 +110,7 @@ public struct LyricsView: View {
                     }
                     .onReceive(timer) { _ in
                         let playingTime = progressing.playbackState.time
-                        let maxPosition = progressing.lyrics.maxPosition + updateTimerInterval
+                        let maxPosition = lyrics.maxPosition + updateTimerInterval
                         if playingTime <= maxPosition {
                             elapsedTime = playingTime
                         }
@@ -124,19 +124,7 @@ public struct LyricsView: View {
     private func halfHeightSpacer(_ geometry: GeometryProxy) -> some View {
         Spacer(minLength: geometry.size.height / 2)
     }
-
-    /// Position at line index.
-    private func position(at lineIndex: Int) -> TimeInterval? {
-        if let progressing = coreStore.progressingState {
-            let lyricsLines = progressing.lyrics.lines
-            if lineIndex < lyricsLines.count {
-                let position = lyricsLines[lineIndex].position
-                return position
-            }
-        }
-        return nil
-    }
-
+    
     /// Scroll to index with animation.
     private func scrollToIndex(_ index: Int, proxy: ScrollViewProxy) {
         withAnimation(.easeInOut) {

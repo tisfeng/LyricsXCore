@@ -15,6 +15,9 @@ public struct KaraokeLyricsView: View {
     // We need lyricsLine.nextLine to determine if the line is playing, and lyricsLine.lyrics is weak, so we need to keep a strong reference for it.
     private let lyrics: Lyrics
 
+    /// The current playback position.
+    /// @Binding is not necessary, but it can reduce cpu usage from 15% to 6% in my test.
+    /// TODO: improve performance.
     @Binding private var elapsedTime: TimeInterval
 
     @State private var progress: Double = 0
@@ -181,7 +184,6 @@ let previewLine = {
 }()
 
 let lyrics = Lyrics(lines: [previewLine], idTags: [:])
-
 
 // Preview helper view to simulate playback
 struct KaraokeLyricsPreview: View {

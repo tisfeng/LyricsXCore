@@ -14,18 +14,18 @@ import MusicPlayer
 import Foundation
 
 public struct LyricsSearchingState: Equatable {
-    public let track: MusicTrack
+    public let track: MusicTrack?
     public var searchResultSorted: [Lyrics] = []
     public var currentLyrics: Lyrics? = nil
     public var searchTerm: LyricsSearchRequest.SearchTerm? = nil
     
-    public init(track: MusicTrack) {
+    public init(track: MusicTrack? = nil) {
         self.track = track
     }
     
     private mutating func setSearchTerm(_ term: LyricsSearchRequest.SearchTerm) -> LyricsSearchRequest {
         searchTerm = term
-        return LyricsSearchRequest(searchTerm: term, duration: track.duration ?? 0)
+        return LyricsSearchRequest(searchTerm: term, duration: track?.duration ?? 0)
     }
     
     private mutating func clearPreviousSearch() {
@@ -38,7 +38,7 @@ public struct LyricsSearchingState: Equatable {
         switch action {
         case .autoSearch:
             state.clearPreviousSearch()
-            guard let title = state.track.title, let artist = state.track.artist else {
+            guard let title = state.track?.title, let artist = state.track?.artist else {
                 state.searchTerm = nil
                 return .none
             }
