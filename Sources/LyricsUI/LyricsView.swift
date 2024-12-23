@@ -122,6 +122,7 @@ public struct LyricsView: View {
             Text("No lyrics available")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .foregroundColor(.secondary)
+                .contentShape(Rectangle())
                 .padding()
         }
     }
