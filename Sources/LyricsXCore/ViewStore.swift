@@ -40,19 +40,27 @@ public func createViewStore(
 
     let store = Store(
         initialState: coreState,
-        reducer: Reducer(LyricsProgressingState.reduce)
-            .optional()
-            .pullback(
-                state: \LyricsXCoreState.progressingState,
-                action: /LyricsXCoreAction.progressingAction,
-                environment: { $0 }),
+        reducer: Reducer<LyricsXCoreState, LyricsXCoreAction, LyricsXCoreEnvironment> { state, action, environment in
+            if case .progressingAction = action, state.progressingState == nil {
+                // Ignore progressing actions when state is nil
+                return .none
+            }
+
+            return Reducer(LyricsProgressingState.reduce)
+                .optional()
+                .pullback(
+                    state: \LyricsXCoreState.progressingState,
+                    action: /LyricsXCoreAction.progressingAction,
+                    environment: { $0 })
+                .run(&state, action, environment)
+        },
         environment: .default)
 
     return ViewStore(store)
 }
 
 public func createPlaybackState(elapsedTime: Double, isPlaying: Bool)
-    -> MusicPlayer.PlaybackState
+-> MusicPlayer.PlaybackState
 {
     isPlaying ? .playing(time: elapsedTime) : .paused(time: elapsedTime)
 }

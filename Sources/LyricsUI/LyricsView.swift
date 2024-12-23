@@ -22,7 +22,7 @@ var updateTimerInterval = 0.1
 @available(macOS 13.0, *)
 public struct LyricsView: View {
 
-    @EnvironmentObject public var coreStore: ViewStore<LyricsXCoreState, LyricsXCoreAction>
+    @EnvironmentObject public var viewStore: ViewStore<LyricsXCoreState, LyricsXCoreAction>
 
     @Binding public var isAutoScrollEnabled: Bool
     public var showTranslation: Bool
@@ -47,7 +47,7 @@ public struct LyricsView: View {
     }
 
     public var body: some View {
-        if let progressing = coreStore.progressingState {
+        if let progressing = viewStore.progressingState {
             let currentLineIndex = progressing.currentLineIndex
             let lyrics = progressing.lyrics
             let lyricsLines = lyrics.lines
@@ -116,7 +116,13 @@ public struct LyricsView: View {
                         }
                     }
                 }
+
             }
+        } else {
+            Text("No lyrics available")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundColor(.secondary)
+                .padding()
         }
     }
 

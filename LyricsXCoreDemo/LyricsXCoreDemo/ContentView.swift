@@ -75,8 +75,9 @@ struct ContentView: View {
     }
 
     /// Seek to position.
-    public func seekTo(position: TimeInterval, isPlaying: Bool) {
+    private func seekTo(position: TimeInterval, isPlaying: Bool) {
         self.isPlaying = isPlaying
+
         let playbackState: PlaybackState = isPlaying ? .playing(time: position) : .paused(time: position)
         let updatedPlaybackState = LyricsProgressingAction.playbackStateUpdated(playbackState)
         viewStore.send(.progressingAction(updatedPlaybackState))
