@@ -11,7 +11,7 @@ import LyricsService
 import MusicPlayer
 
 public class LyricsSearchService {
-    var track: MusicTrack?
+    public var track: MusicTrack?
 
     private var provider: LyricsProviders.Group
     private var searchCanceller: AnyCancellable?
@@ -24,14 +24,15 @@ public class LyricsSearchService {
     /// Search lyrics with optional text and track info
     /// - Parameters:
     ///   - keyword: Search text, optional
-    ///   - completion: Callback with search results or error
-    public func searchLyrics(
-        keyword: String? = nil,
-        completion: @escaping (Result<[Lyrics], Error>) -> Void
-    ) {
+    public func searchLyrics(keyword: String? = nil) async throws -> [Lyrics] {
         var searchText = keyword ?? ""
         if searchText.isEmpty {
             searchText = "\(track?.title ?? "") \(track?.artist ?? "")"
+        }
+
+        // if searchText is only whitespace, return empty array
+        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return []
         }
 
         let searchReq = LyricsSearchRequest(
@@ -39,23 +40,26 @@ public class LyricsSearchService {
             duration: track?.duration ?? 0
         )
 
-        var results: [Lyrics] = []
+        return try await withCheckedThrowingContinuation { continuation in
+            var results: [Lyrics] = []
 
-        searchCanceller = provider.lyricsPublisher(request: searchReq)
-            .timeout(.seconds(10), scheduler: DispatchQueue.main)
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { completionStatus in
-                    if case .failure(let error) = completionStatus {
-                        completion(.failure(error))
-                    } else {
-                        completion(.success(results))
+            searchCanceller = provider.lyricsPublisher(request: searchReq)
+                .timeout(.seconds(10), scheduler: DispatchQueue.main)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { completionStatus in
+                        switch completionStatus {
+                        case .finished:
+                            continuation.resume(returning: results)
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
+                    },
+                    receiveValue: { lyrics in
+                        results.append(lyrics)
                     }
-                },
-                receiveValue: { lyrics in
-                    results.append(lyrics)
-                }
-            )
+                )
+        }
     }
 
     /// Cancel ongoing search

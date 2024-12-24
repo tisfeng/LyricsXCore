@@ -154,19 +154,19 @@ public struct LyricsSearchView: View {
         searchResults = []
         error = nil
 
-        searchService.searchLyrics(keyword: searchText) { result in
-            isLoading = false
-            switch result {
-            case .success(let lyrics):
-                self.searchResults = lyrics
-            case .failure(let err):
-                self.error = err
+        Task {
+            do {
+                searchResults = try await searchService.searchLyrics(keyword: searchText)
+                isLoading = false
+            } catch {
+                isLoading = false
+                self.error = error
             }
         }
     }
 
     /// Get selected lyrics from searchResults
-    func getSelectedLyrics(_ lyricsDescription: String?) -> Lyrics? {
+    private func getSelectedLyrics(_ lyricsDescription: String?) -> Lyrics? {
         return searchResults.first { $0.description == lyricsDescription?.description }
     }
 }
