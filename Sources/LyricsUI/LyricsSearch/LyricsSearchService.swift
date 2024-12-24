@@ -11,14 +11,15 @@ import LyricsService
 import MusicPlayer
 
 public class LyricsSearchService {
+    /// We need track info to search the best lyrics.
     public var track: MusicTrack?
 
     private var provider: LyricsProviders.Group
     private var searchCanceller: AnyCancellable?
 
-    public init(providers: [LyricsProviders.Service] = [.qq, .netease, .kugou], track: MusicTrack? = nil) {
-        self.provider = .init(service: providers)
+    public init(track: MusicTrack? = nil, providers: [LyricsProviders.Service] = [.qq, .netease, .kugou]) {
         self.track = track
+        self.provider = .init(service: providers)
     }
 
     /// Search lyrics with optional text and track info
@@ -69,7 +70,9 @@ public class LyricsSearchService {
 
     /// Pick the best lyrics from searchResults
     public func pickBestLyrics(from searchResults: [Lyrics], highQuality: Bool = false) -> Lyrics? {
-        guard let track = track else { return nil }
+        guard let track else {
+            return searchResults.first
+        }
 
         // 1. Perfect match (title + artist + album + duration)
         if let perfectMatch = searchResults.first(where: { lyrics in

@@ -12,6 +12,7 @@ import SwiftUI
 
 @available(macOS 12.0, *)
 public struct LyricsSearchView: View {
+    /// We need track info to search the best lyrics.
     var track: MusicTrack?
     let onLyricsSelected: ((Lyrics) -> Void)?
 
@@ -21,14 +22,16 @@ public struct LyricsSearchView: View {
     @State private var error: Error?
     @State private var selectedLyricsDescription: String?
 
-    private let searchService = LyricsSearchService()
+    private let searchService: LyricsSearchService
 
-    public init(track: MusicTrack?, onLyricsSelected: ((Lyrics) -> Void)? = nil) {
+    public init(track: MusicTrack? = nil, onLyricsSelected: ((Lyrics) -> Void)? = nil) {
         self.track = track
         self.onLyricsSelected = onLyricsSelected
 
         let keywords = "\(track?.title ?? "") \(track?.artist ?? "")"
         _searchText = State(initialValue: keywords)
+
+        searchService = .init(track: track)
     }
 
     public var body: some View {
