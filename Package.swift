@@ -14,7 +14,7 @@ let package = Package(
             targets: ["LyricsXCore", "LyricsUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/tisfeng/LyricsKit", .revision("6b131e8aa91ca7fb21d8d5b37528b1be36c38b2c")),
+        .package(url: "https://github.com/tisfeng/LyricsKit", .branchItem("dev")),
         .package(url: "https://github.com/tisfeng/MusicPlayer", .branchItem("dev")),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", .upToNextMinor(from: "0.40.0")),
     ],

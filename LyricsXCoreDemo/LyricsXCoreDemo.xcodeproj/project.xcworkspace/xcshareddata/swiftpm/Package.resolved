@@ -51,7 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tisfeng/LyricsKit",
       "state" : {
-        "revision" : "6b131e8aa91ca7fb21d8d5b37528b1be36c38b2c"
+        "branch" : "dev",
+        "revision" : "8cebb14ebbea57c6890aa383845d5f0d1218bb7d"
       }
     },
     {
