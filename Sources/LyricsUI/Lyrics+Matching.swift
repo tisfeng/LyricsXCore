@@ -94,3 +94,9 @@ extension Lyrics {
         return Swift.min(score, maxScore)
     }
 }
+
+extension MusicTrack {
+    public var searchText: String {
+        [title, artist].compactMap { $0 }.joined(separator: " ")
+    }
+}

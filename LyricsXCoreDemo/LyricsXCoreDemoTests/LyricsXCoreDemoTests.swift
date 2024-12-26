@@ -13,9 +13,6 @@ import MusicPlayer
 struct LyricsXCoreDemoTests {
 
     @Test func testLyricsSearchService() async throws {
-        let service = LyricsSearchService()
-        let lyricsList = try await service.searchLyrics(keyword: "一生不变 李克勤")
-
         let track = MusicTrack(
             id: "1",
             title: "一生不变",
@@ -23,6 +20,9 @@ struct LyricsXCoreDemoTests {
             artist: "李克勤",
             duration: 262
         )
+
+        let service = LyricsSearchService()
+        let lyricsList = try await service.searchLyrics(keyword: track.searchText)
 
         let bestLyrics = lyricsList.pickBestLyrics(track: track)
         #expect((bestLyrics?.metadata.service == .qq))
