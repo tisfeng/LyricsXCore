@@ -10,7 +10,18 @@
 		03674ECC2CF1DC030062BA63 /* LyricsXCore in Frameworks */ = {isa = PBXBuildFile; productRef = 03674ECB2CF1DC030062BA63 /* LyricsXCore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		030798082D1D986E00798C96 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 03674E842CF1D9700062BA63 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 03674E8B2CF1D9700062BA63;
+			remoteInfo = LyricsXCoreDemo;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		030798042D1D986E00798C96 /* LyricsXCoreDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LyricsXCoreDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		03674E8C2CF1D9700062BA63 /* LyricsXCoreDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LyricsXCoreDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -25,6 +36,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		030798052D1D986E00798C96 /* LyricsXCoreDemoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LyricsXCoreDemoTests;
+			sourceTree = "<group>";
+		};
 		03674E8E2CF1D9700062BA63 /* LyricsXCoreDemo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -36,6 +52,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		030798012D1D986E00798C96 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		03674E892CF1D9700062BA63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -51,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				03674E8E2CF1D9700062BA63 /* LyricsXCoreDemo */,
+				030798052D1D986E00798C96 /* LyricsXCoreDemoTests */,
 				03674EA92CF1DAA10062BA63 /* Frameworks */,
 				03674E8D2CF1D9700062BA63 /* Products */,
 			);
@@ -60,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				03674E8C2CF1D9700062BA63 /* LyricsXCoreDemo.app */,
+				030798042D1D986E00798C96 /* LyricsXCoreDemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,6 +99,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		030798032D1D986E00798C96 /* LyricsXCoreDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0307980C2D1D986E00798C96 /* Build configuration list for PBXNativeTarget "LyricsXCoreDemoTests" */;
+			buildPhases = (
+				030798002D1D986E00798C96 /* Sources */,
+				030798012D1D986E00798C96 /* Frameworks */,
+				030798022D1D986E00798C96 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				030798092D1D986E00798C96 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				030798052D1D986E00798C96 /* LyricsXCoreDemoTests */,
+			);
+			name = LyricsXCoreDemoTests;
+			packageProductDependencies = (
+			);
+			productName = LyricsXCoreDemoTests;
+			productReference = 030798042D1D986E00798C96 /* LyricsXCoreDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		03674E8B2CF1D9700062BA63 /* LyricsXCoreDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 03674E9B2CF1D9720062BA63 /* Build configuration list for PBXNativeTarget "LyricsXCoreDemo" */;
@@ -107,6 +155,10 @@
 				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
+					030798032D1D986E00798C96 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = 03674E8B2CF1D9700062BA63;
+					};
 					03674E8B2CF1D9700062BA63 = {
 						CreatedOnToolsVersion = 16.1;
 					};
@@ -130,11 +182,19 @@
 			projectRoot = "";
 			targets = (
 				03674E8B2CF1D9700062BA63 /* LyricsXCoreDemo */,
+				030798032D1D986E00798C96 /* LyricsXCoreDemoTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		030798022D1D986E00798C96 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		03674E8A2CF1D9700062BA63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -145,6 +205,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		030798002D1D986E00798C96 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		03674E882CF1D9700062BA63 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -154,7 +221,49 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		030798092D1D986E00798C96 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 03674E8B2CF1D9700062BA63 /* LyricsXCoreDemo */;
+			targetProxy = 030798082D1D986E00798C96 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0307980A2D1D986E00798C96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 79NQA2XYHM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.izual.LyricsXCoreDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LyricsXCoreDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LyricsXCoreDemo";
+			};
+			name = Debug;
+		};
+		0307980B2D1D986E00798C96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 79NQA2XYHM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.izual.LyricsXCoreDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LyricsXCoreDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LyricsXCoreDemo";
+			};
+			name = Release;
+		};
 		03674E992CF1D9720062BA63 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -332,6 +441,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0307980C2D1D986E00798C96 /* Build configuration list for PBXNativeTarget "LyricsXCoreDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0307980A2D1D986E00798C96 /* Debug */,
+				0307980B2D1D986E00798C96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		03674E872CF1D9700062BA63 /* Build configuration list for PBXProject "LyricsXCoreDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

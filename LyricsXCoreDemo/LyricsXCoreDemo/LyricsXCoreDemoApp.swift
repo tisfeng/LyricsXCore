@@ -19,7 +19,7 @@ struct LyricsXCoreDemoApp: App {
         .windowStyle(.hiddenTitleBar)
 
         Window(String.searchLyrics, id: .searchLyrics) {
-            LyricsSearchView(searchText: "一生不变 谭咏麟") { lyrics in
+            LyricsSearchView(searchText: "一生不变 李克勤") { lyrics in
                 dismissWindow(id: .searchLyrics)
 
                 print(lyrics)
