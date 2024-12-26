@@ -6,13 +6,28 @@
 //
 
 import SwiftUI
+import LyricsService
 
 @main
 struct LyricsXCoreDemoApp: App {
+    @Environment(\.dismissWindow) var dismissWindow
+
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
         .windowStyle(.hiddenTitleBar)
+
+        Window(String.searchLyrics, id: .searchLyrics) {
+            LyricsSearchView(searchText: "一生不变 谭咏麟") { lyrics in
+                dismissWindow(id: .searchLyrics)
+
+                print(lyrics)
+            }
+        }
     }
+}
+
+extension String {
+    static let searchLyrics = "Search Lyrics"
 }

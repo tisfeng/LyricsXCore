@@ -16,6 +16,8 @@ struct ContentView: View {
     @State private var isAutoScrollEnabled = true
     @State private var isPlaying = false
 
+    @Environment(\.openWindow) var openWindow
+
     private var viewStore = createViewStore(
         track: PreviewResources.track,
         lyrics: PreviewResources.lyrics
@@ -35,6 +37,12 @@ struct ContentView: View {
             .padding()
             .onAppear {
                 seekTo(position: 0, isPlaying: true)
+            }
+            .contextMenu {
+                // Search lyrics
+                Button("Search Lyrics") {
+                    openWindow(id: .searchLyrics)
+                }
             }
 
             /// Controls for auto-scroll and play/pause, just for demo.
