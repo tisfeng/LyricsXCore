@@ -173,9 +173,9 @@ public struct KaraokeLyricsView: View {
 
 // MARK: - Previews
 
-let previewLineWithoutTags = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
+fileprivate let previewLineWithoutTags = LyricsLine(content: "一幽风飞散发披肩", position: 29.874)
 
-let previewLine = {
+fileprivate let previewLine = {
     var line = previewLineWithoutTags
     let timeTagStr =
         "[00:29.874][tt]<0,0><182,1><566,2><814,3><1126,4><1377,5><3003,6><3248,7><6504,8><6504>"
@@ -183,7 +183,7 @@ let previewLine = {
     return line
 }()
 
-let lyrics = Lyrics(lines: [previewLine], idTags: [:])
+fileprivate let lyrics = Lyrics(lines: [previewLine], idTags: [:])
 
 // Preview helper view to simulate playback
 struct KaraokeLyricsPreview: View {
