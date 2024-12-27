@@ -56,42 +56,67 @@ extension Lyrics {
     /// Calculate matching score for the lyrics based on various criteria
     /// - Parameters:
     ///   - track: The track to match against
-    /// - Returns: A score between 0 and 100
+    /// - Returns: A normalized score between 0 and 1
     public func calculateMatchingScore(track: MusicTrack) -> Double {
+        // Define scoring weights
+        let durationWeight: Double = 0.3
+        let titleWeight: Double = 0.2
+        let artistWeight: Double = 0.2
+        let albumWeight: Double = 0.1
+        let translationWeight: Double = 0.1
+        let timeTagWeight: Double = 0.1
+        
         var score: Double = 0
-        let maxScore: Double = 100
-
-        // Duration match has the highest priority if exists
+        var maxPossibleScore: Double = 0
+        
+        // Duration match (30%)
         if let lyricsLength = length, let duration = track.duration {
+            maxPossibleScore += durationWeight
             if lyricsLength == duration {
-                score += 50  // Duration exact match
+                score += durationWeight  // Perfect duration match
             } else {
                 // Calculate duration difference ratio (0-1)
                 let durationDiff = abs(lyricsLength - duration)
                 let durationRatio = Swift.max(0, 1 - (durationDiff / duration))
-                score += 40 * durationRatio  // Up to 40 points for close duration match
+                score += durationWeight * durationRatio
             }
         }
-
-        // Title match (30 points)
-        if let title = idTags[.title], title == track.title {
-            score += 30
+        
+        // Title match (20%)
+        if let title = idTags[.title], let trackTitle = track.title {
+            maxPossibleScore += titleWeight
+            let titleSimilarity = title.similarity(to: trackTitle)
+            score += titleWeight * titleSimilarity
         }
-
-        // Artist match (15 points)
-        if let artist = idTags[.artist], artist == track.artist {
-            score += 15
+        
+        // Artist match (20%)
+        if let artist = idTags[.artist], let trackArtist = track.artist {
+            maxPossibleScore += artistWeight
+            let artistSimilarity = artist.similarity(to: trackArtist)
+            score += artistWeight * artistSimilarity
         }
-
-        // Album match (5 points)
-        if let album = idTags[.album], album == track.album {
-            score += 5
+        
+        // Album match (10%)
+        if let album = idTags[.album], let trackAlbum = track.album {
+            maxPossibleScore += albumWeight
+            let albumSimilarity = album.similarity(to: trackAlbum)
+            score += albumWeight * albumSimilarity
         }
-
-        // Quality bonus (up to 10 points)
-        score += Double(quality) * 10
-
-        return Swift.min(score, maxScore)
+        
+        // Translation (10%)
+        if metadata.hasTranslation {
+            maxPossibleScore += translationWeight
+            score += translationWeight
+        }
+        
+        // Time tag (10%)
+        if metadata.attachmentTags.contains(.timetag) {
+            maxPossibleScore += timeTagWeight
+            score += timeTagWeight
+        }
+        
+        // Normalize score based on available matching criteria
+        return maxPossibleScore > 0 ? Swift.min(score / maxPossibleScore, 1.0) : 0
     }
 }
 
