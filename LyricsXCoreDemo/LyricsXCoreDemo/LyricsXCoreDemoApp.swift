@@ -42,15 +42,12 @@ struct LyricsXCoreDemoApp: App {
 
     /// Start searching lyrics
     func searchLyrics() async {
-        searchState.searchText = track.searchText
+        searchState.searchText = track.searchQuery
+        searchState.searchService = LyricsSearchService(providers: [.netease, .qq, .kugou])
         await searchState.performSearch()
 
-        let sortedLyricsList = searchState.lyricsList.sortedByScore(track: track)
-
-        searchState.lyricsList = sortedLyricsList.map { lyrics in
-            lyrics.metadata[Lyrics.Metadata.Key("quality")] = lyrics.calculateMatchingScore(track: track)
-            return lyrics
-        }
+        let sortedLyricsList = searchState.lyricsList.rankedByQuality(for: track)
+        searchState.lyricsList = sortedLyricsList
     }
 }
 

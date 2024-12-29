@@ -27,7 +27,7 @@ struct LyricsXCoreDemoTests {
         let bestLyrics = lyricsList.pickBestLyrics(track: track)
         #expect((bestLyrics?.metadata.service == .qq))
 
-        let sortedLyrics = lyricsList.sortedByScore(track: track)
+        let sortedLyrics = lyricsList.sortedByScore(for track: track)
 
         if let length = sortedLyrics.first?.length {
             #expect(Int(length) == 262)
