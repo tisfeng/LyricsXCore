@@ -21,7 +21,7 @@ struct LyricsXCoreDemoApp: App {
         duration: 262
     )
 
-    @StateObject private var searchState = SearchState()
+    @StateObject private var searchService = LyricsSearchService()
 
     var body: some Scene {
         WindowGroup {
@@ -30,7 +30,7 @@ struct LyricsXCoreDemoApp: App {
         .windowStyle(.hiddenTitleBar)
 
         Window(String.searchLyrics, id: .searchLyrics) {
-            LyricsSearchView(searchState: searchState) { lyrics in
+            LyricsSearchView(searchService: searchService) { lyrics in
                 dismissWindow(id: .searchLyrics)
                 print(lyrics)
             }
@@ -42,12 +42,10 @@ struct LyricsXCoreDemoApp: App {
 
     /// Start searching lyrics
     func searchLyrics() async {
-        searchState.searchText = track.searchQuery
-        searchState.searchService = LyricsSearchService(providers: [.netease, .qq, .kugou])
-        await searchState.performSearch()
+        await searchService.searchLyrics(with: track.searchQuery)
 
-        let sortedLyricsList = searchState.lyricsList.rankedByQuality(for: track)
-        searchState.lyricsList = sortedLyricsList
+        let sortedLyricsList = searchService.lyricsList.rankedByQuality(for: track)
+        searchService.lyricsList = sortedLyricsList
     }
 }
 
