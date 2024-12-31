@@ -39,7 +39,6 @@ struct ContentView: View {
                 seekTo(position: 0, isPlaying: true)
             }
             .contextMenu {
-                // Search lyrics
                 Button("Search Lyrics") {
                     openWindow(id: .searchLyrics)
                 }
